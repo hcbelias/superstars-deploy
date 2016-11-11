@@ -269,7 +269,7 @@ UserSchema.methods = {
         imagePathRegex = /^https?\:\/\/([^\.]+)\.googleusercontent\.com\/([^\?]+)(\?(.*))?$/;
 
     // Updating the 'sz' (size) parameter to 80 (default: sz=50)
-    profilePicture = profilePicture.replace(/sz\=\d+/, 'sz=80');
+    profilePicture = profilePicture.replace(/sz\=\d+/, 'sz=160');
 
     if (_environment2.default.profile.proxyPictureRequest && imagePathRegex.test(profilePicture)) {
       var imagePathMatch = profilePicture.match(imagePathRegex);

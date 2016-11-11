@@ -65,6 +65,10 @@ function respondWithCompleteProfileResult(res, statusCode) {
       return res.status(404).end();
     }
 
+    sortResults(entity.completeProfile.education, 'startDate', false);
+    sortResults(entity.completeProfile.experiences, 'startDate', false);
+    sortResults(entity.completeProfile.certifications, 'startDate', false);
+
     return res.status(statusCode).json(entity.completeProfile);
   };
 }
@@ -128,7 +132,11 @@ function getQuerySearchAllFields(querystring) {
       searchRegExp = new RegExp('.*' + searchTerms[i] + '.*', 'i');
       addQuerySearchSkill(queryTerms, searchRegExp);
       queryTerms.push({
-        currentRole: {
+        name: {
+          $regex: searchRegExp
+        }
+      }, {
+        currentPosition: {
           $regex: searchRegExp
         }
       }, {
@@ -188,7 +196,7 @@ function show(req, res, next) {
  * Get a single user
  */
 function update(req, res, next) {
-  var username = req.params.username;
+  var username = req.body.username;
 
   return _user2.default.findOneAndUpdate({ username: username }, req.body, { new: true }).exec().then(respondWithCompleteProfileResult(res)).catch(function (err) {
     return next(err);
@@ -222,5 +230,19 @@ function searchBySkill(req, res, next) {
  */
 function authCallback(req, res, next) {
   res.redirect('/');
+}
+
+/**
+* Sort an array of results
+*/
+
+function sortResults(arr, field, asc) {
+  arr = arr.sort(function (el1, el2) {
+    if (asc) {
+      return el1[field] > el2[field] ? 1 : el1[field] < el2[field] ? -1 : 0;
+    } else {
+      return el2[field] > el1[field] ? 1 : el2[field] < el1[field] ? -1 : 0;
+    }
+  });
 }
 //# sourceMappingURL=../../api/user/user.controller.js.map

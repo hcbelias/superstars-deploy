@@ -17,7 +17,7 @@ var router = new _express.Router();
 router.get('/', auth.isAuthenticated(), controller.index);
 router.get('/me', auth.isAuthenticated(), controller.me);
 router.get('/skill', auth.isAuthenticated(), controller.searchBySkill);
-router.get('/:username', auth.isAuthenticated(), controller.show);
+router.get('/:username', controller.show);
 router.put('/', auth.isAuthenticated(), controller.update);
 
 module.exports = router;

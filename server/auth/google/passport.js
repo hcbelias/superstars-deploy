@@ -23,9 +23,13 @@ function setup(User, config) {
     clientSecret: config.google.clientSecret,
     callbackURL: config.google.callbackURL
   }, function (accessToken, refreshToken, profile, done) {
-    User.findOne({ 'google.id': profile.id }).exec().then(function (user) {
+    var email = profile.emails[0].value;
+    var fields = email.split('@');
+    var username = fields[0];
+    var domain = fields[1];
+    User.findOne({ 'username': username }).exec().then(function (user) {
 
-      if (config.domain !== profile.emails[0].value.split('@')[1]) {
+      if (config.domain !== domain) {
         return done(null, false, { message: "error-message-invalid-account" });
       }
 
@@ -35,8 +39,8 @@ function setup(User, config) {
 
       user = new User({
         name: profile.displayName,
-        email: profile.emails[0].value,
-        username: profile.emails[0].value.split('@')[0],
+        email: email,
+        username: username,
         provider: 'google',
         google: profile._json
       });
