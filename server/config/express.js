@@ -52,16 +52,16 @@ exports.default = function (app) {
    */
   if (env !== 'test' && !process.env.SAUCE_USERNAME) {
     app.use((0, _lusca2.default)({
-      csrf: {
-        angular: true
-      },
+      //  csrf: {
+      //  angular: true
+      //},
+
       xframe: 'SAMEORIGIN',
       hsts: {
         maxAge: 31536000, //1 year, in seconds
         includeSubDomains: true,
         preload: true
-      },
-      xssProtection: true
+      }
     }));
   }
 

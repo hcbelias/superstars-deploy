@@ -23,6 +23,84 @@ _mongoose2.default.Promise = require('bluebird');
 
 var authTypes = ['github', 'twitter', 'facebook', 'google'];
 
+var experienceSchema = new _mongoose.Schema({
+  position: {
+    type: String,
+    required: true
+  },
+  company: {
+    type: String,
+    required: true
+  },
+  project: String,
+  client: String,
+  startDate: {
+    type: Date,
+    required: true
+  },
+  skills: {
+    type: Array,
+    default: []
+  },
+  endDate: Date,
+  isCurrentPosition: Boolean,
+  activityDescription: String
+});
+
+var skillSchema = new _mongoose.Schema({
+  name: { type: String, required: 'Skill Name is a required field.', trim: true },
+  experienceYears: { type: Number, default: 0 }
+});
+
+var educationSchema = new _mongoose.Schema({
+  school: {
+    type: String,
+    required: 'School Name is a required field.'
+  },
+  degree: {
+    type: String,
+    required: 'Degree is a required field.'
+  },
+  field: {
+    type: String,
+    required: 'Field is a required field.'
+  },
+  activities: String,
+  startDate: {
+    type: Date,
+    required: 'Start Date is a required field.'
+  },
+  endDate: Date
+});
+
+var certificationSchema = new _mongoose.Schema({
+  name: {
+    type: String,
+    required: 'Certification Name is a required field.'
+  },
+  authority: {
+    type: String,
+    required: 'Certification Authority is a required field.'
+  },
+  startDate: Date,
+  endDate: Date
+});
+
+var languageSchema = new _mongoose.Schema({
+  name: {
+    type: String,
+    required: 'Language is a required field.'
+  },
+  level: { type: Number, default: 1 }
+});
+
+var hobbySchema = new _mongoose.Schema({
+  name: {
+    type: String,
+    required: 'Hobby name is a required field.'
+  }
+});
+
 var UserSchema = new _mongoose.Schema({
   name: {
     type: String,
@@ -62,14 +140,21 @@ var UserSchema = new _mongoose.Schema({
   external_id: {
     type: String
   },
-  social: {
-    type: {
-      skype: String,
-      facebook: String,
-      linkedIn: String,
-      twitter: String
-    },
-    default: {}
+  skype: {
+    type: String,
+    default: ''
+  },
+  facebook: {
+    type: String,
+    default: ''
+  },
+  twitter: {
+    type: String,
+    default: ''
+  },
+  linkedIn: {
+    type: String,
+    default: ''
   },
   provider: String,
   salt: String,
@@ -80,104 +165,24 @@ var UserSchema = new _mongoose.Schema({
   currentProject: {
     type: String
   },
-  hobbies: {
-    type: [String],
-    default: []
-  },
-  experiences: {
-    type: [{
-      position: {
-        type: String,
-        required: true
-      },
-      company: {
-        type: String,
-        required: true
-      },
-      project: String,
-      client: String,
-      startDate: {
-        type: Date,
-        required: true
-      },
-      skills: {
-        type: Array,
-        default: []
-      },
-      endDate: Date,
-      isCurrentPosition: Boolean,
-      activityDescription: String
-    }],
-    default: []
-  },
-  skillsCloud: {
-    type: [{
-      skill: {
-        type: String,
-        required: 'Skill Name is a required field.'
-      },
-      experienceYears: Number,
-      selfGrade: Number
-    }],
-    default: []
-  },
   profileComplete: {
     type: Boolean,
     default: false
   },
   aboutMe: {
-    type: String
+    type: String,
+    default: ''
   },
   summaryOfQualification: {
-    type: String
+    type: String,
+    default: ''
   },
-  education: {
-    type: [{
-      school: {
-        type: String,
-        required: 'School Name is a required field.'
-      },
-      degree: {
-        type: String,
-        required: 'Degree is a required field.'
-      },
-      field: {
-        type: String,
-        required: 'Field is a required field.'
-      },
-      activities: String,
-      startDate: {
-        type: Date,
-        required: 'Start Date is a required field.'
-      },
-      endDate: Date
-    }],
-    default: []
-  },
-  certifications: {
-    type: [{
-      name: {
-        type: String,
-        required: 'Certification Name is a required field.'
-      },
-      authority: {
-        type: String,
-        required: 'Certification Authority is a required field.'
-      },
-      startDate: Date,
-      endDate: Date
-    }]
-  },
-  languageSkills: {
-    type: [{
-      name: {
-        type: String,
-        required: 'Language is a required field.'
-      },
-      level: Number
-    }],
-    default: []
-  }
+  hobbies: [hobbySchema],
+  experiences: [experienceSchema],
+  skillsCloud: [skillSchema],
+  education: [educationSchema],
+  certifications: [certificationSchema],
+  languageSkills: [languageSchema]
 }, {
   toJSON: {
     virtuals: true
@@ -222,6 +227,16 @@ UserSchema.virtual('completeProfile').get(function () {
     'skillsCloud': this.skillsCloud,
     'experiences': this.experiences,
     'hobbies': this.hobbies
+  };
+});
+
+//Once our model is changing, I'm creating this virtual prop to keep the contract unchanged
+UserSchema.virtual('social').get(function () {
+  return {
+    'skype': this.skype,
+    'facebook': this.facebook,
+    'linkedIn': this.linkedIn,
+    'twitter': this.twitter
   };
 });
 

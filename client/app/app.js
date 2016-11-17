@@ -1,14 +1,14 @@
 'use strict';
 
 angular.module('superstarsApp', ['superstarsApp.auth', 'superstarsApp.constants', 'superstarsApp.screen', 'ngCookies', 'ngResource', 'ngSanitize', 'btford.socket-io', 'ui.router', 'validation.match', 'ngMaterial', 'ngMessages', 'pascalprecht.translate', 'zInfiniteScroll']).config(function ($urlRouterProvider, $locationProvider, $translateProvider, $mdThemingProvider, appConfig) {
-    $urlRouterProvider.otherwise('/');
+  $urlRouterProvider.otherwise('/');
 
-    $locationProvider.html5Mode(true);
+  $locationProvider.html5Mode(true);
 
-    $translateProvider.translations('en', appConfig.I18N.en);
-    $translateProvider.preferredLanguage('en');
+  $translateProvider.translations('en', appConfig.I18N.en);
+  $translateProvider.preferredLanguage('en');
 
-    $mdThemingProvider.theme('default').primaryPalette('blue').warnPalette('orange');
+  $mdThemingProvider.theme('default').primaryPalette('blue').warnPalette('orange');
 });
 //# sourceMappingURL=../app/app.js.map
 'use strict';
@@ -1371,6 +1371,65 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 //# sourceMappingURL=../../../components/profile/skills/skills.component.js.map
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+  var ProfileTileController = function () {
+    function ProfileTileController(ProfileTileLocker) {
+      _classCallCheck(this, ProfileTileController);
+
+      this.ProfileTileLocker = ProfileTileLocker;
+      this.addButtonEnabled = angular.isDefined(this.addButtonEnabled) ? this.addButtonEnabled : true;
+
+      this.initTileLockListener();
+    }
+
+    _createClass(ProfileTileController, [{
+      key: 'initTileLockListener',
+      value: function initTileLockListener() {
+        var _this = this;
+
+        if (!this.profileTileLockerId) {
+          return;
+        }
+
+        this.tileLocker = this.ProfileTileLocker.subscribe(this.profileTileLockerId, function (locked) {
+          _this.locked = locked;
+        });
+      }
+    }, {
+      key: '$onDestroy',
+      value: function $onDestroy() {
+        if (this.tileLocker) {
+          this.tileLocker.unsubscribe();
+        }
+      }
+    }]);
+
+    return ProfileTileController;
+  }();
+
+  angular.module('superstarsApp').component('profileTile', {
+    transclude: true,
+    templateUrl: 'components/profile/tile/profileTile.html',
+    controller: ProfileTileController,
+    bindings: {
+      title: '@',
+      icon: '@',
+      addButtonFlex: '@',
+      showAddButton: '@',
+      addButtonEnabled: '<',
+      profileTileLockerId: '<',
+      onHelp: '&',
+      onAddItem: '&'
+    }
+  });
+})();
+//# sourceMappingURL=../../../components/profile/tile/profileTile.component.js.map
+'use strict';
+
 (function () {
 
   function ProfileTileLocker() {
@@ -1438,65 +1497,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   angular.module('superstarsApp').factory('ProfileTileLocker', ProfileTileLocker);
 })();
 //# sourceMappingURL=../../../components/profile/tileLocker/profileTileLocker.service.js.map
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-(function () {
-  var ProfileTileController = function () {
-    function ProfileTileController(ProfileTileLocker) {
-      _classCallCheck(this, ProfileTileController);
-
-      this.ProfileTileLocker = ProfileTileLocker;
-      this.addButtonEnabled = angular.isDefined(this.addButtonEnabled) ? this.addButtonEnabled : true;
-
-      this.initTileLockListener();
-    }
-
-    _createClass(ProfileTileController, [{
-      key: 'initTileLockListener',
-      value: function initTileLockListener() {
-        var _this = this;
-
-        if (!this.profileTileLockerId) {
-          return;
-        }
-
-        this.tileLocker = this.ProfileTileLocker.subscribe(this.profileTileLockerId, function (locked) {
-          _this.locked = locked;
-        });
-      }
-    }, {
-      key: '$onDestroy',
-      value: function $onDestroy() {
-        if (this.tileLocker) {
-          this.tileLocker.unsubscribe();
-        }
-      }
-    }]);
-
-    return ProfileTileController;
-  }();
-
-  angular.module('superstarsApp').component('profileTile', {
-    transclude: true,
-    templateUrl: 'components/profile/tile/profileTile.html',
-    controller: ProfileTileController,
-    bindings: {
-      title: '@',
-      icon: '@',
-      addButtonFlex: '@',
-      showAddButton: '@',
-      addButtonEnabled: '<',
-      profileTileLockerId: '<',
-      onHelp: '&',
-      onAddItem: '&'
-    }
-  });
-})();
-//# sourceMappingURL=../../../components/profile/tile/profileTile.component.js.map
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2156,4 +2156,4 @@ $templateCache.put("components/profile/timelineTile/timelineTile.html","<profile
 $templateCache.put("components/profile/topBar/topBar.html","<div layout=\"row\" layout-xs=\"column\" layout-align-xs=\"center center\" flex-wrap=\"\"><img src=\"{{$ctrl.user.picture}}\"/><div layout=\"column\" layout-align-xs=\"center center\" class=\"details\"><div class=\"name\">{{$ctrl.user.name | uppercase}}</div><div class=\"position\">{{$ctrl.user.position || \'[Position]\'}}</div><div class=\"city\">{{$ctrl.user.city || \'[City]\'}}</div></div><span flex=\"\"></span><div hide-xs=\"\" hide-sm=\"\" class=\"logo\"></div></div>");
 $templateCache.put("components/profile/workingExperience/workingExperience.html","<div ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"experience-position\">{{$ctrl.model.position}}</span> at <span class=\"experience-company\">{{$ctrl.model.company}}</span></h1><div class=\"experience-dates\"><span>From:&nbsp;</span><span class=\"experience-start-date\">{{$ctrl.model.startDate | date: \'MM/dd/yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"experience-end-date\">{{$ctrl.model.endDate | date: \'MM/dd/yyyy\'}}</span></div><div class=\"experience-description\">{{$ctrl.model.activityDescription}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><label>Company</label><input name=\"company\" ng-model=\"$ctrl.model.company\" autofocus=\"autofocus\" required=\"required\" class=\"experience-company\"/><div ng-messages=\"editForm.company.$error\"><div ng-message=\"required\">Company name can not be empty</div></div></md-input-container><md-input-container class=\"md-block\"><label>Position</label><input name=\"position\" ng-model=\"$ctrl.model.position\" required=\"required\" class=\"experience-position\"/><div ng-messages=\"editForm.position.$error\"><div ng-message=\"required\">Position can not be empty</div></div></md-input-container><div layout=\"row\"><md-input-container class=\"flex\"><label>From</label><md-datepicker name=\"startDate\" ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" md-max-date=\"$ctrl.model.endDate\" ng-required=\"true\" class=\"experience-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><div ng-message=\"required\">Start Date cannot be empty</div><div ng-message=\"valid\">Start Date must be a valid date</div></div></md-input-container><md-input-container class=\"flex\"><label>To</label><md-datepicker name=\"endDate\" ng-model=\"$ctrl.model.endDate\" md-hide-icons=\"calendar\" md-min-date=\"$ctrl.model.startDate\" class=\"experience-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><div ng-message=\"valid\">End Date must be a valid date</div><div ng-message=\"mindate\">End Date should be greater than Start Date</div></div></md-input-container></div><md-input-container class=\"md-block\"><label>Description</label><textarea name=\"description\" ng-model=\"$ctrl.model.activityDescription\" required=\"required\" class=\"experience-description\"></textarea><div ng-messages=\"editForm.description.$error\"><div ng-message=\"required\">Description can not be empty</div></div></md-input-container><md-button type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
 $templateCache.put("components/profile/workingExperiences/workingExperiences.html","<profile-timeline-tile title=\"Working Experiences\" icon=\"card_travel\" on-help=\"$ctrl.help($event)\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"true\" add-button-flex=\"true\" add-button-enabled=\"!$ctrl.isInEditMode()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\"><profile-timeline-item ng-repeat=\"experience in $ctrl.items\" year=\"{{experience.startDate | date:\'yyyy\'}}\" blocked=\"$ctrl.isBlocked(experience)\" fixed-remove-icon=\"$ctrl.isEditing(experience)\" on-remove=\"$ctrl.removeItem(experience)\" read-only=\"$ctrl.readOnly\"><profile-working-experience experience=\"experience\" editing=\"$ctrl.isEditing(experience)\" on-edit=\"$ctrl.editItem(experience)\" on-update=\"$ctrl.updateItem(experience)\" on-cancel=\"$ctrl.cancelItem(experience)\" read-only=\"$ctrl.readOnly\"></profile-working-experience></profile-timeline-item></profile-timeline-tile>");
-$templateCache.put("app/account/login/login.html","<div layout=\"column\" layout-align=\"center center\" flex=\"flex\" class=\"oauth-button-container\"><div layout=\"column\" layout-align=\"center center\" layout-wrap=\"layout-wrap\" flex=\"flex\"><img alt=\"Avenue Code Superstars\" src=\"assets/images/main_logo-c45f76e722.png\" class=\"img-responsive text-center\"/><p id=\"non-ac-account-login-msg\">You need to have an Avenue Code account to access this application.</p><p class=\"error\">{{ serverMessage }}</p><oauth-buttons classes=\"btn-block\"></oauth-buttons></div></div>");}]);
+$templateCache.put("app/account/login/login.html","<div layout=\"column\" layout-align=\"center center\" flex=\"flex\" class=\"oauth-button-container\"><div layout=\"column\" layout-align=\"center center\" layout-wrap=\"layout-wrap\" flex=\"flex\"><img alt=\"Avenue Code Superstars\" src=\"assets/images/main_logo-1d29e635dd.png\" class=\"img-responsive text-center\"/><p id=\"non-ac-account-login-msg\">You need to have an Avenue Code account to access this application.</p><p class=\"error\">{{ serverMessage }}</p><oauth-buttons classes=\"btn-block\"></oauth-buttons></div></div>");}]);

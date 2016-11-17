@@ -71,7 +71,6 @@ function onConnect(socket) {
   });
 
   // Insert sockets below
-  require('../api/thing/thing.socket').register(socket);
   require('../api/user/user.profile.socket').register(socket);
 }
 //# sourceMappingURL=../config/socketio.js.map

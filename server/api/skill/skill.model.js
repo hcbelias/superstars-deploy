@@ -12,7 +12,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var SkillSchema = new _mongoose2.default.Schema({
   name: String,
-  info: String,
   active: Boolean
 });
 

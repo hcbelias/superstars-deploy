@@ -7,7 +7,7 @@ module.exports = {
 
   // MongoDB connection options
   mongo: {
-    uri: 'mongodb://localhost/superstars-dev'
+    uri: 'mongodb://localhost/superstars-dev2'
   }
 
 };
