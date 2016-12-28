@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -80,7 +76,9 @@ var skypeContactProperty = 'skype';
 var linkedinContactProperty = 'linkedIn';
 
 function findUserByUsername(username) {
-  return _user2.default.findOne({ username: username }).exec();
+  return _user2.default.findOne({
+    username: username
+  }).exec();
 }
 
 function respondWithBasicProfileResult(res, statusCode) {
@@ -168,7 +166,9 @@ function getQuerySearchSkill(querystring) {
       searchRegExp = new RegExp('.*' + searchTerms[i] + '.*', 'i');
       addQuerySearchSkill(queryTerms, searchRegExp);
     }
-    query = { $or: queryTerms };
+    query = {
+      $or: queryTerms
+    };
   } else {
     query = null;
   }
@@ -221,7 +221,9 @@ function getQuerySearchAllFields(querystring) {
         }
       });
     }
-    query = { $or: queryTerms };
+    query = {
+      $or: queryTerms
+    };
   }
   return query;
 }
@@ -254,7 +256,11 @@ function show(req, res, next) {
 function update(req, res, next) {
   var username = req.body.username;
 
-  return _user2.default.findOneAndUpdate({ username: username }, req.body, { new: true }).exec().then(respondWithCompleteProfileResult(res)).catch(function (err) {
+  return _user2.default.findOneAndUpdate({
+    username: username
+  }, req.body, {
+    new: true
+  }).exec().then(respondWithCompleteProfileResult(res)).catch(function (err) {
     return next(err);
   });
 }
@@ -264,39 +270,42 @@ function update(req, res, next) {
  */
 function me(req, res, next) {
   var userId = req.user._id;
-  return _user2.default.findOne({ _id: userId }).exec().then(respondWithBasicProfileResult(res)).catch(function (err) {
+  return _user2.default.findOne({
+    _id: userId
+  }).exec().then(respondWithBasicProfileResult(res)).catch(function (err) {
     return next(err);
   });
 }
 
 /**
-* Search user by skill
-*/
+ * Search user by skill
+ */
 function searchBySkill(req, res, next) {
   var query = getQuerySearchSkill(req.query);
   if (!query) {
     return res.status(200).json([]); // if none skill is passed, we dont return users
   }
-  console.log((0, _stringify2.default)(query));
   return _user2.default.find(query).exec().then(respondWithBasicProfileResultList(res)).catch(handleError(res));
 }
 
 //  NEW ENDPOINTS AND AUX FUNCTIONS
 
 function getErrorObject(error) {
-  return { "error": error };
+  return {
+    "error": error
+  };
 }
 
 function findUserPropertyAndUpdateByUserProperty(req, res, action, propertyName) {
   var username = req.params.username;
-  var propertyId = req.body._id;
-  var propertyValue = req.body;
+  var propertyId = req.params.id;
+  var propertyValue = req.body.data;
   return findUserByUsername(username).then(handleUserNotFound(res)).then(action(res, propertyName, propertyId, propertyValue)).catch(handleError(res));
 }
 
 function findUserAndCreateUserProperty(req, res, propertyName) {
   var username = req.params.username;
-  return findUserByUsername(username).then(handleUserNotFound(res)).then(createUserProperty(res, propertyName, req.body)).catch(handleError(res));
+  return findUserByUsername(username).then(handleUserNotFound(res)).then(createUserProperty(res, propertyName, req.body.data)).catch(handleError(res));
 }
 
 function saveEntity(res, entity, returnValue, code) {
@@ -334,7 +343,6 @@ function createUserProperty(res, propertyName, propertyValue) {
   return function (entity) {
     var property = entity[propertyName];
     property.push(propertyValue);
-    console.log(propertyValue);
     return saveEntity(res, entity, property[property.length - 1]);
   };
 }
@@ -418,13 +426,15 @@ function createHobby(req, res, next) {
 function updateSimpleField(res, propertyName, propertyValue) {
   return function (entity) {
     entity[propertyName] = propertyValue;
-    return saveEntity(res, entity, { 'value': entity[propertyName] });
+    return saveEntity(res, entity, {
+      'data': entity[propertyName]
+    });
   };
 }
 
 function findUserAndUpdateProperty(req, res, action, propertyName) {
   var username = req.params.username;
-  var propertyValue = req.body.value;
+  var propertyValue = req.body.data;
   console.log('Property Value - ' + propertyValue);
   return findUserByUsername(username).then(handleUserNotFound(res)).then(action(res, propertyName, propertyValue)).catch(handleError(res));
 }
@@ -461,8 +471,8 @@ function authCallback(req, res, next) {
 }
 
 /**
-* Sort an array of results
-*/
+ * Sort an array of results
+ */
 
 function sortResults(arr, field, asc) {
   arr = arr.sort(function (el1, el2) {
