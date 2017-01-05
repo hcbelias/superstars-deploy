@@ -11,8 +11,8 @@ var _mongoose2 = _interopRequireDefault(_mongoose);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var SkillSchema = new _mongoose2.default.Schema({
-  name: String,
-  active: Boolean
+  name: { required: 'Skill name is required', type: String },
+  active: { default: true, type: Boolean }
 });
 
 exports.default = _mongoose2.default.model('Skill', SkillSchema);

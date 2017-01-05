@@ -27,6 +27,7 @@ function setup(User, config) {
     var fields = email.split('@');
     var username = fields[0];
     var domain = fields[1];
+    console.log('Google accessToken: ' + accessToken);
     User.findOne({ 'username': username }).exec().then(function (user) {
 
       if (config.domain !== domain) {

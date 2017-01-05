@@ -30,6 +30,8 @@ exports.deleteCertification = deleteCertification;
 exports.createCertification = createCertification;
 exports.deleteHobby = deleteHobby;
 exports.createHobby = createHobby;
+exports.deletePosition = deletePosition;
+exports.createPosition = createPosition;
 exports.updateAboutMe = updateAboutMe;
 exports.updateSummary = updateSummary;
 exports.updateFacebook = updateFacebook;
@@ -66,6 +68,7 @@ var skillProperty = 'skillsCloud';
 var experienceProperty = 'experiences';
 var languageProperty = 'languageSkills';
 var hobbyProperty = 'hobbies';
+var positionProperty = 'positions';
 var educationProperty = 'education';
 var certificationProperty = 'certifications';
 var aboutMeProperty = 'aboutMe';
@@ -141,16 +144,16 @@ function handleError(res, statusCode) {
   };
 }
 
-function addQuerySearchSkill(queryTerms, searchRegExp) {
-  queryTerms.push({
+function addQuerySearchSkill(searchRegExp) {
+  return {
     skillsCloud: {
       $elemMatch: {
-        skill: {
+        name: {
           $regex: searchRegExp
         }
       }
     }
-  });
+  };
 }
 
 function getQuerySearchSkill(querystring) {
@@ -158,13 +161,12 @@ function getQuerySearchSkill(querystring) {
       searchTerms = void 0,
       queryTerms = [],
       searchRegExp = void 0;
-
   //Check if there are query strings
   if ((0, _keys2.default)(querystring).length !== 0) {
     searchTerms = querystring.q.split(' ');
     for (var i = 0; i < searchTerms.length; i++) {
       searchRegExp = new RegExp('.*' + searchTerms[i] + '.*', 'i');
-      addQuerySearchSkill(queryTerms, searchRegExp);
+      queryTerms.push(addQuerySearchSkill(searchRegExp));
     }
     query = {
       $or: queryTerms
@@ -180,13 +182,13 @@ function getQuerySearchAllFields(querystring) {
       searchTerms = void 0,
       queryTerms = [],
       searchRegExp = void 0;
-
   //Check if there are query strings
   if ((0, _keys2.default)(querystring).length !== 0) {
     searchTerms = querystring.q.split(' ');
     for (var i = 0; i < searchTerms.length; i++) {
       searchRegExp = new RegExp('.*' + searchTerms[i] + '.*', 'i');
-      addQuerySearchSkill(queryTerms, searchRegExp);
+
+      queryTerms.push(addQuerySearchSkill(searchRegExp));
       queryTerms.push({
         name: {
           $regex: searchRegExp
@@ -420,6 +422,15 @@ function deleteHobby(req, res, next) {
 
 function createHobby(req, res, next) {
   return findUserAndCreateUserProperty(req, res, hobbyProperty);
+}
+
+// positions
+function deletePosition(req, res, next) {
+  return findUserPropertyAndUpdateByUserProperty(req, res, deleteUserProperty, positionProperty);
+}
+
+function createPosition(req, res, next) {
+  return findUserAndCreateUserProperty(req, res, positionProperty);
 }
 
 //Simple field

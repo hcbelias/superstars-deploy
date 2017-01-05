@@ -46,6 +46,9 @@ router.delete('/:username/experience/:id', auth.isAuthenticated(), controller.de
 router.post('/:username/hobby', auth.isAuthenticated(), controller.createHobby);
 router.delete('/:username/hobby/:id', auth.isAuthenticated(), controller.deleteHobby);
 
+router.post('/:username/position', auth.isAuthenticated(), controller.createPosition);
+router.delete('/:username/position/:id', auth.isAuthenticated(), controller.deletePosition);
+
 //Simple fields
 router.put('/:username/aboutme', auth.isAuthenticated(), controller.updateAboutMe);
 router.put('/:username/summary', auth.isAuthenticated(), controller.updateSummary);

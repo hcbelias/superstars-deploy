@@ -100,7 +100,12 @@ var hobbySchema = new _mongoose.Schema({
     required: 'Hobby name is a required field.'
   }
 });
-
+var positionSchema = new _mongoose.Schema({
+  name: {
+    type: String,
+    required: 'Positiona name is a required field.'
+  }
+});
 var UserSchema = new _mongoose.Schema({
   name: {
     type: String,
@@ -116,14 +121,6 @@ var UserSchema = new _mongoose.Schema({
     type: String,
     lowercase: true,
     required: true
-  },
-  city: {
-    type: String,
-    trim: true
-  },
-  currentPosition: {
-    type: String,
-    trim: true
   },
   currentLocation: {
     type: String,
@@ -177,6 +174,7 @@ var UserSchema = new _mongoose.Schema({
     type: String,
     default: ''
   },
+  positions: [positionSchema],
   hobbies: [hobbySchema],
   experiences: [experienceSchema],
   skillsCloud: [skillSchema],
@@ -199,7 +197,7 @@ UserSchema.virtual('profile').get(function () {
     'name': this.name,
     'role': this.role,
     'email': this.email,
-    'position': this.currentPosition,
+    'positions': this.positions,
     'location': this.currentLocation,
     'social': this.social,
     'picture': this.getProfilePicture(),
@@ -215,7 +213,7 @@ UserSchema.virtual('completeProfile').get(function () {
     'role': this.role,
     'email': this.email,
     'username': this.username,
-    'position': this.currentPosition,
+    'positions': this.positions,
     'location': this.currentLocation,
     'social': this.social,
     'picture': this.getProfilePicture(),
