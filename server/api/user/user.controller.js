@@ -39,6 +39,11 @@ exports.updateTwitter = updateTwitter;
 exports.updateLinkedin = updateLinkedin;
 exports.updateSkype = updateSkype;
 exports.authCallback = authCallback;
+exports.exportResume = exportResume;
+
+var _exportUserProfile = require('../../components/exportUserProfile');
+
+var _exportUserProfile2 = _interopRequireDefault(_exportUserProfile);
 
 var _user = require('./user.model');
 
@@ -57,8 +62,6 @@ var _jsonwebtoken = require('jsonwebtoken');
 var _jsonwebtoken2 = _interopRequireDefault(_jsonwebtoken);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Mongo = require('mongodb');
 
 var userWithPropertyNotFoundMsg = 'User with this property not found';
 var userNotFoundMsg = 'User not found';
@@ -479,6 +482,26 @@ function updateSkype(req, res, next) {
  */
 function authCallback(req, res, next) {
   res.redirect('/');
+}
+
+/**
+ * Export PDF Resume
+ */
+
+function exportResume(req, res) {
+  findUserByUsername(req.params.username).then(function (user) {
+    if (!user) {
+      return res.status(404).end();
+    }
+    var buffer = _exportUserProfile2.default.exportToDocx(user);
+
+    res.setHeader('Content-disposition', 'attachment; filename=resume-' + user.username + '.docx');
+
+    return res.status(200).send(buffer).end();
+  }).catch(function (err) {
+    console.error('Error generating user report: ' + err);
+    return res.status(400).end();
+  });
 }
 
 /**

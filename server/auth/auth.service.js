@@ -8,6 +8,7 @@ exports.hasRole = hasRole;
 exports.signToken = signToken;
 exports.setTokenCookie = setTokenCookie;
 exports.hasPermissionToEdit = hasPermissionToEdit;
+exports.hasPermissionToAddEntity = hasPermissionToAddEntity;
 
 var _passport = require('passport');
 
@@ -113,7 +114,19 @@ function hasPermissionToEdit(req, res) {
       next();
     } else {
       res.status(403).send({
-        message: 'This user does not have permission to edit other profiles.'
+        message: 'This user does not have permission to edit.'
+      });
+    }
+  });
+}
+
+function hasPermissionToAddEntity(req, res) {
+  return (0, _composableMiddleware2.default)().use(isAuthenticated()).use(function hasPermission(req, res, next) {
+    if (req.user.role === 'admin') {
+      next();
+    } else {
+      res.status(403).send({
+        message: 'This user does not have permission to edit.'
       });
     }
   });

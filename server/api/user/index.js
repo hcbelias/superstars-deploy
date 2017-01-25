@@ -18,8 +18,11 @@ router.get('/', auth.isAuthenticated(), controller.index);
 router.get('/me', auth.isAuthenticated(), controller.me);
 router.get('/:username', controller.show);
 
+//Export Resume
+router.get('/:username/resume-doc', controller.exportResume);
+
 // Old endpoint to save - Temporary
-router.put('/', auth.isAuthenticated(), controller.update);
+//router.put('/', auth.isAuthenticated(), controller.update);
 
 // New endpoints
 router.get('/skill', auth.isAuthenticated(), controller.searchBySkill);

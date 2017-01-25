@@ -24,6 +24,10 @@ _mongoose2.default.Promise = require('bluebird');
 var authTypes = ['github', 'twitter', 'facebook', 'google'];
 
 var experienceSchema = new _mongoose.Schema({
+  isAvenueCode: {
+    type: Boolean,
+    default: false
+  },
   position: {
     type: String,
     required: true
@@ -48,8 +52,15 @@ var experienceSchema = new _mongoose.Schema({
 });
 
 var skillSchema = new _mongoose.Schema({
-  name: { type: String, required: 'Skill Name is a required field.', trim: true },
-  experienceYears: { type: Number, default: 0 }
+  name: {
+    type: String,
+    required: 'Skill Name is a required field.',
+    trim: true
+  },
+  experienceYears: {
+    type: Number,
+    default: 0
+  }
 });
 
 var educationSchema = new _mongoose.Schema({
@@ -91,7 +102,10 @@ var languageSchema = new _mongoose.Schema({
     type: String,
     required: 'Language is a required field.'
   },
-  level: { type: Number, default: 1 }
+  level: {
+    type: Number,
+    default: 1
+  }
 });
 
 var hobbySchema = new _mongoose.Schema({

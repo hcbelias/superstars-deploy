@@ -226,6 +226,13 @@ angular.module('superstarsApp').controller('LogoutController', LogoutController)
 		},
 		"cookies": {
 			"error-login": "error-message-invalid-account"
+		},
+		"languageLevels": {
+			"1": "Elementary Proficiency",
+			"2": "Limited Proficiency",
+			"3": "Professional Proficiency",
+			"4": "Full Professional Proficiency",
+			"5": "Native or Bilingual Proficiency"
 		}
 	});
 })(angular);
@@ -615,6 +622,41 @@ angular.module('superstarsApp').directive('footer', function () {
 //# sourceMappingURL=../../components/footer/footer.directive.js.map
 'use strict';
 
+(function () {
+  'use strict';
+
+  function HideOnClickWindow($window) {
+    return {
+      scope: {
+        rule: '@'
+      },
+      restrict: 'A',
+      link: function link(scope, element) {
+        var el = angular.element(element[0]);
+        var window = angular.element($window);
+
+        el.addClass('hide');
+
+        window.bind('click', function () {
+          el.addClass('hide');
+          scope.rule = false;
+        });
+
+        scope.$watch('rule', function () {
+          if (scope.rule) {
+            el.removeClass('hide');
+            window[0].event.stopPropagation();
+          }
+        });
+      }
+    };
+  }
+
+  angular.module('superstarsApp').directive('hideOnClickWindow', HideOnClickWindow);
+})();
+//# sourceMappingURL=../../components/hideOnClickWindow/hideOnClickWindow.directive.js.map
+'use strict';
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 (function () {
@@ -801,7 +843,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     _createClass(ProfileAboutMeController, [{
       key: 'help',
-      value: function help($event) {
+      value: function help() {
         this.ProfileService.help('About Me', 'Share a brief description about yourself and tell something interesting about you.');
       }
     }, {
@@ -914,6 +956,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   });
 })();
 //# sourceMappingURL=../../../components/profile/certification/certification.component.js.map
+/* exported ProfileTimelineBaseController */
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -970,7 +1013,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
     }, {
       key: 'help',
-      value: function help($event) {
+      value: function help() {
         this.ProfileService.help('Certifications', 'Add all of your certifications.');
       }
     }]);
@@ -1009,7 +1052,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     _createClass(ProfileContactController, [{
       key: 'help',
-      value: function help($event) {
+      value: function help() {
         this.ProfileService.help('Contacts', 'Add your personal contact information here.');
       }
     }, {
@@ -1114,6 +1157,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   });
 })();
 //# sourceMappingURL=../../../components/profile/education/education.component.js.map
+/* exported ProfileTimelineBaseController */
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1169,7 +1213,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
     }, {
       key: 'help',
-      value: function help($event) {
+      value: function help() {
         this.ProfileService.help('Educations', 'Add here your educational background.');
       }
     }]);
@@ -1312,13 +1356,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           });
         });
       }
-    }, {
-      key: 'setLevel',
-      value: function setLevel(language, level) {
-        this.user.languageSkills[this.user.languageSkills.indexOf(language)].level = level;
-        language.level = level;
-        this.doUpdate(language);
-      }
+
+      // setLevel(language, level) {
+      //   this.user.languageSkills[this.user.languageSkills.indexOf(language)].level = level;
+      //   language.level = level;
+      //   this.doUpdate(language);
+      // }
+
     }, {
       key: 'update',
       value: function update(language) {
@@ -1367,7 +1411,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
     }, {
       key: 'help',
-      value: function help($event) {
+      value: function help() {
         this.ProfileService.help('Languages', 'Add the languages you know and your proficiency.');
       }
     }]);
@@ -1436,7 +1480,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     _createClass(ProfileQualificationSummaryController, [{
       key: 'help',
-      value: function help($event) {
+      value: function help() {
         this.ProfileService.help('Qualification Summary', 'Tell us about your technical and professional profile.');
       }
     }, {
@@ -1801,7 +1845,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 (function () {
   var TopBarController = function () {
-    function TopBarController(Position, ProfileTileLocker, $filter, Screen) {
+    function TopBarController(Position) {
       _classCallCheck(this, TopBarController);
 
       this.PositionService = Position;
@@ -1902,6 +1946,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       this.model = null;
       this.currentDate = new Date();
+      this.AvenueCodeCompany = 'Avenue Code';
     }
 
     _createClass(ProfileWorkingExperienceController, [{
@@ -1945,6 +1990,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function resetModel(experience) {
         this.model = angular.copy(experience || this.experience);
       }
+    }, {
+      key: 'fillAvenueCodeCompany',
+      value: function fillAvenueCodeCompany() {
+
+        if (this.model.isAvenueCode) {
+          this.model.company = this.AvenueCodeCompany;
+        } else {
+          this.model.client = this.model.company = this.model.project = '';
+        }
+      }
     }]);
 
     return ProfileWorkingExperienceController;
@@ -1964,6 +2019,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   });
 })();
 //# sourceMappingURL=../../../components/profile/workingExperience/workingExperience.component.js.map
+/* exported ProfileTimelineBaseController */
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2020,7 +2076,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
     }, {
       key: 'help',
-      value: function help($event) {
+      value: function help() {
         this.ProfileService.help('Working Experiences', 'Add your previous work experiences.');
       }
     }]);
@@ -2145,6 +2201,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 //# sourceMappingURL=../../components/services/skill.service.js.map
 'use strict';
 
+function correctParse(data) {
+  var user = JSON.parse(data);
+  var fields = ['certifications', 'education', 'experiences'];
+  var dateFields = ['startDate', 'endDate'];
+
+  for (var i in fields) {
+    if (user[fields[i]]) {
+      for (var k in user[fields[i]]) {
+        if (user[fields[i]][k]) {
+          for (var j in dateFields) {
+            if (user[fields[i]][k][dateFields[j]]) {
+              user[fields[i]][k][dateFields[j]] = new Date(user[fields[i]][k][dateFields[j]]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return user;
+}
+
 (function () {
   function UserResource($resource) {
     return $resource('/api/users/:username/:path/:id', {
@@ -2196,32 +2274,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           username: '@username',
           path: '@path',
           id: '@id'
-        },
-        transformResponse: correctParse
-      }
-    });
-  }
-
-  function correctParse(data) {
-    var user = JSON.parse(data);
-    var fields = ['certifications', 'education', 'experiences'];
-    var dateFields = ['startDate', 'endDate'];
-
-    for (var i in fields) {
-      if (user[fields[i]]) {
-        for (var k in user[fields[i]]) {
-          if (user[fields[i]][k]) {
-            for (var j in dateFields) {
-              if (user[fields[i]][k][dateFields[j]]) {
-                user[fields[i]][k][dateFields[j]] = new Date(user[fields[i]][k][dateFields[j]]);
-              }
-            }
-          }
         }
       }
-    }
-
-    return user;
+    });
   }
 
   angular.module('superstarsApp.auth').factory('User', UserResource);
@@ -2318,13 +2373,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   }
 
   var ListBottomSheetCtrl = function () {
-    function ListBottomSheetCtrl(Util, $location, $mdBottomSheet, $state, $stateParams, Auth) {
+    function ListBottomSheetCtrl(Util, $location, $mdBottomSheet, $state, $stateParams, Auth, $window) {
       _classCallCheck(this, ListBottomSheetCtrl);
 
       this.location = $location;
       this.state = $state;
       this.mdBottomSheet = $mdBottomSheet;
       this.stateParams = $stateParams;
+      this.window = $window;
       var ctrl = this;
       Auth.getCurrentUser(function (user) {
         ctrl.items = Util.getMenuActionItems('ListBottomCtrl.stateParams.username', user.username);
@@ -2342,6 +2398,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var clickedItem = this.items[$index];
         this.location.path(clickedItem.path);
         this.mdBottomSheet.hide();
+      }
+    }, {
+      key: 'openSubMenu',
+      value: function openSubMenu($index) {
+        var item = this.items[$index];
+        item.openMenu = !item.openMenu;
       }
     }]);
 
@@ -2386,7 +2448,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         } else if (length === 0) {
           query = '';
         }
-        this.state.go('main', { q: query });
+        this.state.go('main', {
+          q: query
+        });
       }
     }, {
       key: 'toggleSidenav',
@@ -2402,6 +2466,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           controllerAs: 'ListBottomCtrl',
           targetEvent: $event
         });
+      }
+    }, {
+      key: 'openButtonMenu',
+      value: function openButtonMenu($index) {
+        var item = this.items[$index];
+        item.openMenu = !item.openMenu;
       }
     }]);
 
@@ -2563,14 +2633,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           sref: 'publicprofile({ username: ' + username + '})',
           show: 'profile',
           target: '_blank'
-
+        }, {
+          name: 'Export Profile',
+          icon: 'launch',
+          show: 'profile',
+          hasOptions: true,
+          menuOptions: [{
+            icon: '<img src="../../assets/images/docx-icon-02336285f3.svg" height="15" />',
+            label: 'Export to DOCX',
+            link: '/api/users/' + loggedUser + '/resume-doc'
+          }, {
+            icon: '<i class="material-icons">insert_drive_file</i>',
+            label: 'Export to PDF',
+            link: '/api/users/' + loggedUser + '/resume-pdf'
+          }]
         }, {
           name: 'Help',
           icon: 'help',
           sref: 'help',
           show: 'all',
           target: ''
-
         }];
       },
 
@@ -2643,24 +2725,24 @@ $templateCache.put("components/footer/footer.html","<div class=\"container\"><p>
 $templateCache.put("components/navbar/navbar.html","<md-toolbar><div layout=\"column\" layout-align=\"center center\" ng-show=\"nav.isLoggedIn()\" class=\"inset\"> <a ng-href=\" {{nav.UserProfileLink}}\"><img src=\"{{ nav.currentUser.picture }}\" alt=\"{{nav.currentUser.picture}}\" class=\"avatar-picture\"/></a><a ng-href=\"{{nav.UserProfileLink}}\"><div id=\"user-name-on-navbar\">{{ nav.currentUser.name | uppercase}}</div></a></div><div layout=\"column\" layout-align=\"center center\" ng-hide=\"nav.isLoggedIn()\" class=\"inset unsigned-user-toolbar\"> <i class=\"material-icons\">account_circle</i><oauth-buttons></oauth-buttons></div></md-toolbar><md-divider>  </md-divider><md-content flex=\"flex\"><md-list class=\"md-dense\"><md-list-item class=\"md-2-line active-link\"><a id=\"sup-j-navbar-superstars\" href=\"{{nav.SuperstarsLink}}\"><i class=\"material-icons\">star</i>SUPERSTARS</a></md-list-item><md-list-item class=\"md-2-line\"><a id=\"sup-j-navbar-acdc\" href=\"{{nav.ACDCLink}}\" target=\"_blank\"><i class=\"material-icons\">date_range</i>ACDC</a></md-list-item><md-list-item class=\"md-2-line\"><a id=\"sup-j-navbar-academy\" href=\"{{nav.AcademyLink}}\" target=\"_blank\"><i class=\"material-icons\">school</i>ACADEMY</a></md-list-item><md-list-item class=\"md-2-line\"><a id=\"sup-j-navbar-miles\" href=\"{{nav.MilesLink}}\" target=\"_blank\"><i class=\"material-icons\">account_balance_wallet</i>MILES</a></md-list-item></md-list></md-content><div ng-show=\"nav.isLoggedIn()\"> <md-divider class=\"bottom-divider\"></md-divider><md-content class=\"bottom-content\"><div class=\"logout-container\"><md-button id=\"navbar-logout-button\" ng-href=\"/logout\" class=\"md-raised\">Logout</md-button></div></md-content></div>");
 $templateCache.put("components/oauth-buttons/oauth-buttons.html","<md-button id=\"navbar-login-button\" ng-click=\"OauthButtons.loginOauth(&quot;google&quot;)\" class=\"md-raised md-primary\">Login</md-button>");
 $templateCache.put("components/scrollTopButton/scrollTopButton.html","<md-button ng-click=\"$ctrl.goTop()\" class=\"md-fab md-primary\"><i id=\"arrow-up\" class=\"material-icons\">arrow_upward</i></md-button>");
-$templateCache.put("components/toolbar/listBottomMenu.html","<md-bottom-sheet id=\"bottom-menu\" ng-cloak=\"ng-cloak\" class=\"md-list md-has-header\"><md-list><md-list-item ng-repeat=\"item in ListBottomCtrl.items\" ng-show=\"ListBottomCtrl.showMenuItem(item)\"><md-button ng-click=\"ListBottomCtrl.listItemClick($index)\" class=\"md-list-item-content\"><a ui-sref=\"{{item.sref}}\" ui-sref-active=\"active\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"md-inline-list-icon-label\">{{ item.name | translate }}</span></a></md-button></md-list-item></md-list></md-bottom-sheet>");
-$templateCache.put("components/toolbar/toolbar.html","<md-toolbar ng-show=\"!toolbarCtrl.isLoggedIn()\" hide-gt-sm=\"hide-gt-sm\" class=\"animate-show\"><div class=\"md-toolbar-tools\"><md-button ng-click=\"toolbarCtrl.toggleSidenav(\'left\')\" aria-label=\"Menu\" class=\"md-icon-button\"><i class=\"material-icons\">menu</i></md-button></div></md-toolbar><md-toolbar ng-show=\"toolbarCtrl.isLoggedIn()\" class=\"animate-show md-whiteframe-z1\"><div data-ng-show=\"toolbarCtrl.showMobileMainHeader\" class=\"md-toolbar-tools\"><md-button ng-click=\"toolbarCtrl.toggleSidenav(\'left\')\" hide-gt-sm=\"hide-gt-sm\" aria-label=\"Menu\" class=\"md-icon-button\"><i class=\"material-icons\">menu</i></md-button><i hide-xs=\"hide-xs\" class=\"material-icons\">search</i><span flex=\"flex\" hide-xs=\"hide-xs\"><md-input-container md-no-float=\"\"><input id=\"sup-j-toolBar-searchField\" placeholder=\"Search for people, skills, positions, clients, projects and more\" ng-model=\"toolbarCtrl.searchText\" ng-model-options=\"{debounce:300}\" ng-change=\"toolbarCtrl.checkLenghtAndUpdate()\" type=\"text\"/></md-input-container></span><div hide-xs=\"hide-xs\" hide-sm=\"hide-sm\" class=\"button-container\"><md-button aria-label=\"{{ buttom.name | translate }}\" ng-repeat=\"item in toolbarCtrl.items\" target=\"{{item.target}}\" ui-sref=\"{{item.sref}}\" id=\"sup-profile-{{ item.name.split(\' \').join(\'\') }}\" ui-sref-active=\"active\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"text-icon\">{{ item.name | translate }}</span></md-button></div><span flex=\"\" hide-gt-xs=\"\">      </span><md-button aria-label=\"Search\" hide-gt-xs=\"\" data-ng-click=\"toolbarCtrl.setMobileMainHeader(false)\" class=\"md-icon-button\"><i class=\"material-icons\">search</i></md-button><md-button aria-label=\"More\" hide-gt-sm=\"hide-gt-sm\" ng-click=\"toolbarCtrl.showListBottomSheet()\" class=\"md-icon-button\"><i class=\"material-icons\">more_vert</i></md-button></div><div hide-gt-xs=\"hide-gt-xs\" data-ng-hide=\"toolbarCtrl.showMobileMainHeader\" class=\"md-toolbar-tools\"><md-button aria-label=\"Back\" data-ng-click=\"toolbarCtrl.setMobileMainHeader(true)\" class=\"md-icon-button\"><i class=\"material-icons\">arrow_back</i></md-button><div md-no-float=\"md-no-float\" style=\"padding-bottom:0px;\" class=\"custom-input-container md-accent\"><span flex=\"flex\"><md-input-container md-no-float=\"\"><input id=\"sup-j-toolBar-searchField\" placeholder=\"Search\" ng-model=\"toolbarCtrl.searchText\" ng-model-options=\"{debounce:300}\" ng-change=\"toolbarCtrl.checkLenghtAndUpdate()\" type=\"text\"/></md-input-container></span></div></div></md-toolbar>");
-$templateCache.put("components/userCard/userCard.html","<div ng-click=\"$ctrl.click()\" layout=\"column\" layout-align=\"none center\" class=\"container\"><img ng-src=\"{{$ctrl.user.picture}}\" alt=\"\" class=\"user-avatar\"/><div class=\"user-name\">{{$ctrl.user.name}}</div><div class=\"user-position\"><md-tooltip md-direction=\"bottom\">{{ $ctrl.positionsTooltip }}</md-tooltip><p ng-show=\"$ctrl.user.positions.length === 0\" class=\"position\">{{ $ctrl.positionsTooltip }}</p><p ng-show=\"$ctrl.user.positions.length === 1\" class=\"position\">{{ $ctrl.user.positions[0].name }}</p><p ng-show=\"$ctrl.user.positions.length &gt; 1\" class=\"position\">{{ $ctrl.user.positions[0].name }} and others</p></div><div class=\"user-email\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.email}}</md-tooltip><div class=\"user-email-text\">{{$ctrl.user.email}}</div></div><div layout=\"row\" layout-align=\"center center\" class=\"actions\"><div ng-show=\"$ctrl.user.social.facebook\" class=\"action facebook\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.facebook}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.facebook}}\" target=\"_blank\"><i class=\"fa fa-facebook-square\"></i></a></div><div ng-show=\"$ctrl.user.social.twitter\" class=\"action twitter\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.twitter}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.twitter}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-twitter\"></i></a></div><div ng-show=\"$ctrl.user.social.skype\" class=\"action skype\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.skype}}</md-tooltip><i aria-hidden=\"true\" class=\"fa fa-skype\"></i></div><div ng-show=\"$ctrl.user.social.linkedIn\" class=\"action linkedIn\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.linkedIn}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.linkedIn}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-linkedin\"></i></a></div></div></div>");
+$templateCache.put("components/toolbar/listBottomMenu.html","<md-bottom-sheet id=\"bottom-menu\" ng-cloak=\"ng-cloak\" class=\"md-list md-has-header\"><md-list><div ng-repeat=\"item in ListBottomCtrl.items\" ng-show=\"ListBottomCtrl.showMenuItem(item)\"><md-list-item><md-button ng-if=\"!item.hasOptions\" ng-click=\"ListBottomCtrl.listItemClick($index)\" class=\"md-list-item-content\"><a ui-sref=\"{{item.sref}}\" ng-click=\"item.sref\" ui-sref-active=\"active\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"md-inline-list-icon-label\">{{ item.name | translate }}</span></a></md-button><md-button ng-if=\"item.hasOptions\" ng-click=\"ListBottomCtrl.openSubMenu($index)\" class=\"md-list-item-content\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"md-inline-list-icon-label\">{{ item.name | translate }}</span></md-button></md-list-item><md-list-item ng-if=\"item.hasOptions &amp;&amp; item.openMenu\" ng-repeat=\"menu in item.menuOptions\" class=\"sub-menu-bottom\"><md-button class=\"md-list-item-content\"><a href=\"{{menu.link}}\" target=\"_blank\"><div layout=\"row\"><div ng-bind-html=\"menu.icon\"></div><span class=\"md-inline-list-icon-label\">{{menu.label}}</span></div></a></md-button></md-list-item></div></md-list></md-bottom-sheet>");
+$templateCache.put("components/toolbar/toolbar.html","<md-toolbar ng-show=\"!toolbarCtrl.isLoggedIn()\" hide-gt-sm=\"hide-gt-sm\" class=\"animate-show\"><div class=\"md-toolbar-tools\"><md-button ng-click=\"toolbarCtrl.toggleSidenav(\'left\')\" aria-label=\"Menu\" class=\"md-icon-button\"><i class=\"material-icons\">menu</i></md-button></div></md-toolbar><md-toolbar ng-show=\"toolbarCtrl.isLoggedIn()\" class=\"animate-show md-whiteframe-z1\"><div data-ng-show=\"toolbarCtrl.showMobileMainHeader\" class=\"md-toolbar-tools\"><md-button ng-click=\"toolbarCtrl.toggleSidenav(\'left\')\" hide-gt-sm=\"hide-gt-sm\" aria-label=\"Menu\" class=\"md-icon-button\"><i class=\"material-icons\">menu</i></md-button><i hide-xs=\"hide-xs\" class=\"material-icons\">search</i><span flex=\"flex\" hide-xs=\"hide-xs\"><md-input-container md-no-float=\"\"><input id=\"sup-j-toolBar-searchField\" placeholder=\"Search for people, skills, positions, clients, projects and more\" ng-model=\"toolbarCtrl.searchText\" ng-model-options=\"{debounce:300}\" ng-change=\"toolbarCtrl.checkLenghtAndUpdate()\" type=\"text\"/></md-input-container></span><div hide-xs=\"hide-xs\" hide-sm=\"hide-sm\" ng-repeat=\"item in toolbarCtrl.items\" ng-show=\"toolbarCtrl.showMenuItem(item)\" class=\"button-container\"><md-button ng-if=\"!item.hasOptions\" aria-label=\"{{ buttom.name | translate }}\" target=\"{{item.target}}\" ui-sref=\"{{item.sref}}\" ng-click=\"item.sref\" id=\"sup-profile-{{ item.name.split(\' \').join(\'\') }}\" ui-sref-active=\"active\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"text-icon\">{{ item.name | translate }}</span></md-button><md-button ng-if=\"item.hasOptions\" aria-label=\"{{ buttom.name | translate }}\" ng-click=\"toolbarCtrl.openButtonMenu($index)\" id=\"sup-profile-{{ item.name.split(\' \').join(\'\') }}\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"text-icon\">{{ item.name | translate }}</span></md-button><div hide-on-click-window=\"hide-on-click-window\" rule=\"{{toolbarCtrl.items[$index].openMenu}}\" ng-if=\"item.hasOptions\" class=\"menu-content md-whiteframe-4dp\"><div ng-repeat=\"menu in toolbarCtrl.items[$index].menuOptions\" class=\"menu-itens\"><a href=\"{{menu.link}}\" target=\"_blank\"><div layout=\"row\"><div ng-bind-html=\"menu.icon\"></div><div class=\"menu-label\">{{menu.label}}</div></div></a></div></div></div><span flex=\"\" hide-gt-xs=\"\">      </span><md-button aria-label=\"Search\" hide-gt-xs=\"\" data-ng-click=\"toolbarCtrl.setMobileMainHeader(false)\" class=\"md-icon-button\"><i class=\"material-icons\">search</i></md-button><md-button aria-label=\"More\" hide-gt-sm=\"hide-gt-sm\" ng-click=\"toolbarCtrl.showListBottomSheet()\" class=\"md-icon-button\"><i class=\"material-icons\">more_vert</i></md-button></div><div hide-gt-xs=\"hide-gt-xs\" data-ng-hide=\"toolbarCtrl.showMobileMainHeader\" class=\"md-toolbar-tools\"><md-button aria-label=\"Back\" data-ng-click=\"toolbarCtrl.setMobileMainHeader(true)\" class=\"md-icon-button\"><i class=\"material-icons\">arrow_back</i></md-button><div md-no-float=\"md-no-float\" style=\"padding-bottom:0px;\" class=\"custom-input-container md-accent\"><span flex=\"flex\"><md-input-container md-no-float=\"\"><input id=\"sup-j-toolBar-searchField\" placeholder=\"Search\" ng-model=\"toolbarCtrl.searchText\" ng-model-options=\"{debounce:300}\" ng-change=\"toolbarCtrl.checkLenghtAndUpdate()\" type=\"text\"/></md-input-container></span></div></div></md-toolbar>");
+$templateCache.put("components/userCard/userCard.html","<div id=\"sup-j-userCard\" ng-click=\"$ctrl.click()\" layout=\"column\" layout-align=\"none center\" class=\"container\"><img ng-src=\"{{$ctrl.user.picture}}\" alt=\"\" class=\"user-avatar\"/><div class=\"user-name\">{{$ctrl.user.name}}</div><div class=\"user-position\"><md-tooltip md-direction=\"bottom\">{{ $ctrl.positionsTooltip }}</md-tooltip><p ng-show=\"$ctrl.user.positions.length === 0\" class=\"position\">{{ $ctrl.positionsTooltip }}</p><p ng-show=\"$ctrl.user.positions.length === 1\" class=\"position\">{{ $ctrl.user.positions[0].name }}</p><p ng-show=\"$ctrl.user.positions.length &gt; 1\" class=\"position\">{{ $ctrl.user.positions[0].name }} and others</p></div><div class=\"user-email\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.email}}</md-tooltip><div class=\"user-email-text\">{{$ctrl.user.email}}</div></div><div layout=\"row\" layout-align=\"center center\" class=\"actions\"><div ng-show=\"$ctrl.user.social.facebook\" class=\"action facebook\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.facebook}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.facebook}}\" target=\"_blank\"><i class=\"fa fa-facebook-square\"></i></a></div><div ng-show=\"$ctrl.user.social.twitter\" class=\"action twitter\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.twitter}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.twitter}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-twitter\"></i></a></div><div ng-show=\"$ctrl.user.social.skype\" class=\"action skype\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.skype}}</md-tooltip><i aria-hidden=\"true\" class=\"fa fa-skype\"></i></div><div ng-show=\"$ctrl.user.social.linkedIn\" class=\"action linkedIn\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.linkedIn}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.linkedIn}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-linkedin\"></i></a></div></div></div>");
 $templateCache.put("components/userList/userList.html","<md-content layout=\"column\" flex=\"flex\" layout-align=\"center center\" ng-hide=\"!$ctrl.loaded || $ctrl.usersShown.length\" class=\"no-results ng-hide\"><div class=\"icon-sad\">:(</div><div class=\"message\">Sorry! No results for: \"{{$ctrl.query}}\"</div></md-content><md-content md-scroll-y=\"md-scroll-y\" layout=\"row\" layout-wrap=\"layout-wrap\" flex=\"flex\" z-infinite-scroll=\"$ctrl.eventHandler\" scroll-threshold=\"300\" time-threshold=\"0\" ng-show=\"$ctrl.usersShown.length\" id=\"user-cards-content\"><user-card ng-repeat=\"user in $ctrl.usersShown\" flex-xs=\"100\" flex-sm=\"50\" flex=\"25\" user=\"user\" on-click=\"$ctrl.click(user)\"></user-card><scroll-top-button parent-id=\"user-cards-content\" min-height=\"304\" miliseconds=\"1000\"></scroll-top-button></md-content>");
 $templateCache.put("app/account/login/login.html","<div layout=\"column\" layout-align=\"center center\" flex=\"flex\" class=\"oauth-button-container\"><div layout=\"column\" layout-align=\"center center\" layout-wrap=\"layout-wrap\" flex=\"flex\"><img alt=\"Avenue Code Superstars\" src=\"assets/images/main_logo-c45f76e722.png\" class=\"img-responsive text-center\"/><p id=\"non-ac-account-login-msg\">You need to have an Avenue Code account to access this application.</p><p class=\"error\">{{ serverMessage }}</p><oauth-buttons classes=\"btn-block\"></oauth-buttons></div></div>");
 $templateCache.put("components/profile/aboutMe/aboutMe.html","<profile-tile title=\"About me\" icon=\"person_outline\" on-help=\"$ctrl.help($event)\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\"><md-input-container class=\"md-block\"><textarea id=\"sup-j-profile-aboutMe\" ng-model=\"$ctrl.user.aboutMe\" ng-disabled=\"$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"About me\" class=\"about-me\"></textarea></md-input-container></profile-tile>");
-$templateCache.put("components/profile/certification/certification.html","<div id=\"sup-j-profile-education-{{ $ctrl.model.name }}\" ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"certification-name\">{{$ctrl.model.name}}</span></h1><div class=\"certification-dates\"><span>From:&nbsp;</span><span class=\"certification-start-date\">{{$ctrl.model.startDate | date: \'MM/dd/yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"certification-end-date\">{{$ctrl.model.endDate | date: \'MM/dd/yyyy\'}}</span></div><div class=\"certification-authority\">{{$ctrl.model.authority}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><label>Certification Name</label><input ng-model=\"$ctrl.model.name\" autofocus=\"autofocus\" required=\"required\" name=\"certificationName\" class=\"certification-name\"/><div ng-messages=\"editForm.certificationName.$error\"><div ng-message=\"required\">Certification Name cannot be empty</div></div></md-input-container><md-input-container class=\"md-block\"><label>Certification Authority</label><input ng-model=\"$ctrl.model.authority\" required=\"required\" name=\"certificationAuthority\" class=\"certification-authority\"/><div ng-messages=\"editForm.certificationAuthority.$error\"><div ng-message=\"required\">Certification Authority cannot be empty	</div></div></md-input-container><div layout=\"row\"><md-input-container flex=\"50\"><label>Start Date</label><md-datepicker ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" name=\"startDate\" required=\"required\" md-max-date=\"$ctrl.currentDate\" md-open-on-focus=\"md-open-on-focus\" class=\"certification-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><div ng-message=\"required\">Start Date cannot be empty</div><div ng-message=\"valid\">Start Date must be a valid date</div><div ng-message=\"maxdate\">Start Date must be less than today</div></div></md-input-container><md-input-container ng-show=\"$ctrl.certificationExpires\" class=\"flex\"><label>End Date</label><md-datepicker ng-model=\"$ctrl.model.endDate\" ng-required=\"$ctrl.certificationExpires\" md-hide-icons=\"calendar\" name=\"endDate\" md-min-date=\"$ctrl.model.startDate\" md-open-on-focus=\"md-open-on-focus\" class=\"certification-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><div ng-message=\"required\">End Date cannot be empty</div><div ng-message=\"valid\">End Date must be a valid date</div><div ng-message=\"mindate\">End Date should be greater than Start Date</div></div></md-input-container></div><md-checkbox ng-checked=\"$ctrl.certificationExpires\" ng-click=\"$ctrl.toggle()\" class=\"certification-expires\">This certification expires.</md-checkbox><md-button type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
+$templateCache.put("components/profile/certification/certification.html","<div id=\"sup-j-profile-certification-{{ $ctrl.model.name.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"certification-name\">{{$ctrl.model.name}}</span></h1><div class=\"certification-dates\"><span>From:&nbsp;</span><span class=\"certification-start-date\">{{$ctrl.model.startDate | date: \'MM/dd/yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"certification-end-date\">{{$ctrl.model.endDate | date: \'MM/dd/yyyy\'}}</span></div><div class=\"certification-authority\">{{$ctrl.model.authority}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><label>Certification Name</label><input id=\"sup-j-certification-name\" ng-model=\"$ctrl.model.name\" autofocus=\"autofocus\" required=\"required\" name=\"certificationName\" class=\"certification-name\"/><div ng-messages=\"editForm.certificationName.$error\"><div ng-message=\"required\">Certification Name cannot be empty</div></div></md-input-container><md-input-container class=\"md-block\"><label>Certification Authority</label><input id=\"sup-j-certification-authority\" ng-model=\"$ctrl.model.authority\" required=\"required\" name=\"certificationAuthority\" class=\"certification-authority\"/><div ng-messages=\"editForm.certificationAuthority.$error\"><div ng-message=\"required\">Certification Authority cannot be empty	</div></div></md-input-container><div layout=\"row\"><md-input-container flex=\"50\"><label>Start Date</label><md-datepicker id=\"sup-j-certification-startDate\" ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" name=\"startDate\" required=\"required\" md-max-date=\"$ctrl.currentDate\" md-open-on-focus=\"md-open-on-focus\" class=\"certification-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><div ng-message=\"required\">Start Date cannot be empty</div><div ng-message=\"valid\">Start Date must be a valid date</div><div ng-message=\"maxdate\">Start Date must be less than today</div></div></md-input-container><md-input-container ng-show=\"$ctrl.certificationExpires\" class=\"flex\"><label>End Date</label><md-datepicker id=\"sup-j-certification-endDate\" ng-model=\"$ctrl.model.endDate\" ng-required=\"$ctrl.certificationExpires\" md-hide-icons=\"calendar\" name=\"endDate\" md-min-date=\"$ctrl.model.startDate\" md-open-on-focus=\"md-open-on-focus\" class=\"certification-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><div ng-message=\"required\">End Date cannot be empty</div><div ng-message=\"valid\">End Date must be a valid date</div><div ng-message=\"mindate\">End Date should be greater than Start Date</div></div></md-input-container></div><md-checkbox id=\"sup-j-certification-checkBox\" ng-checked=\"$ctrl.certificationExpires\" ng-click=\"$ctrl.toggle()\" class=\"certification-expires\">This certification expires.</md-checkbox><md-button id=\"sup-j-certification-save\" type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button id=\"sup-j-certification-cancel\" ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
 $templateCache.put("components/profile/certifications/certifications.html","<profile-timeline-tile title=\"Certification\" icon=\"book\" on-help=\"$ctrl.help($event)\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" add-button-enabled=\"!$ctrl.isInEditMode()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.items.length\" max-items-mobile=\"$ctrl.limitMobile\"><profile-timeline-item ng-repeat=\"certification in $ctrl.items | limitTo: $ctrl.limitTo\" blocked=\"$ctrl.isBlocked(certification)\" fixed-remove-icon=\"$ctrl.isEditing(certification)\" on-remove=\"$ctrl.removeItem(certification)\" read-only=\"$ctrl.readOnly\" year=\"{{certification.startDate | date:\'yyyy\'}}\"><profile-certification certification=\"certification\" editing=\"$ctrl.isEditing(certification)\" on-cancel=\"$ctrl.cancelItem(certification)\" on-edit=\"$ctrl.editItem(certification)\" on-update=\"$ctrl.updateItem(certification)\" read-only=\"$ctrl.readOnly\"></profile-certification></profile-timeline-item></profile-timeline-tile>");
 $templateCache.put("components/profile/contacts/contacts.html","<profile-tile title=\"Contact\" icon=\"smartphone\" on-help=\"$ctrl.help($event)\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\"><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-linkedin\" class=\"fa\"></md-icon><input ng-disabled=\"$ctrl.readOnly\" ng-change=\"$ctrl.update(\'linkedIn\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"linkedin\" id=\"sup-j-profile-contact-in\" ng-model=\"$ctrl.user.social.linkedIn\" aria-label=\"LinkedIn\"/></md-input-container></div><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-facebook\" class=\"fa\"></md-icon><input ng-disabled=\"$ctrl.readOnly\" ng-change=\"$ctrl.update(\'facebook\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"facebook\" id=\"sup-j-profile-contact-fb\" ng-model=\"$ctrl.user.social.facebook\" aria-label=\"Facebook\"/></md-input-container></div><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-twitter\" class=\"fa\"></md-icon><input ng-disabled=\"$ctrl.readOnly\" ng-change=\"$ctrl.update(\'twitter\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"twitter\" id=\"sup-j-profile-contact-tw\" ng-model=\"$ctrl.user.social.twitter\" aria-label=\"Twitter\"/></md-input-container></div><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-skype\" class=\"fa\"></md-icon><input ng-disabled=\"$ctrl.readOnly\" ng-change=\"$ctrl.update(\'skype\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"skype\" id=\"sup-j-profile-contact-sk\" ng-model=\"$ctrl.user.social.skype\" aria-label=\"Skype\"/></md-input-container></div><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-envelope\" class=\"fa\"></md-icon><input ng-disabled=\"true\" ng-change=\"$ctrl.update(\'undefined\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"email\" id=\"sup-j-profile-contact-email\" ng-model=\"$ctrl.user.email\" aria-label=\"Email\"/></md-input-container></div></profile-tile>");
-$templateCache.put("components/profile/education/education.html","<div id=\"sup-j-profile-education-{{ $ctrl.model.degree }}\" ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"education-degree\">{{$ctrl.model.degree}}</span> degree in <span class=\"education-field\">{{$ctrl.model.field}}</span> at <span class=\"education-name\">{{$ctrl.model.school}}</span></h1><div class=\"education-dates\"><span>From:&nbsp;</span><span class=\"education-start-date\">{{$ctrl.model.startDate | date: \'MM/dd/yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"education-end-date\">{{$ctrl.model.endDate | date: \'MM/dd/yyyy\'}}</span></div><div class=\"education-activities\">{{$ctrl.model.activities}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><label>School Name</label><input ng-model=\"$ctrl.model.school\" name=\"school\" autofocus=\"autofocus\" required=\"required\" class=\"education-school\"/><div ng-messages=\"editForm.school.$error\"><p ng-message=\"required\">School name is required</p></div></md-input-container><md-input-container class=\"md-block\"><label>Field</label><input ng-model=\"$ctrl.model.field\" name=\"field\" required=\"required\" class=\"education-field\"/><div ng-messages=\"editForm.field.$error\"><p ng-message=\"required\">Your field is required</p></div></md-input-container><div layout=\"row\"><md-input-container class=\"flex\"><label>From</label><md-datepicker ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" ng-required=\"true\" name=\"startDate\" type=\"date\" md-max-date=\"$ctrl.currentDate\" md-open-on-focus=\"md-open-on-focus\" class=\"education-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><p ng-message=\"required\">Start Date is required</p><p ng-message=\"valid\">Start Date must be a valid date</p><p ng-message=\"maxdate\">Start Date should be less than Today</p></div></md-input-container><md-input-container class=\"flex\"><label>To</label><md-datepicker ng-model=\"$ctrl.model.endDate\" md-hide-icons=\"calendar\" md-min-date=\"$ctrl.model.startDate\" type=\"date\" name=\"endDate\" md-open-on-focus=\"md-open-on-focus\" class=\"education-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><p ng-message=\"valid\">End Date must be a valid date</p><p ng-message=\"mindate\">End Date should be greater than Start Date</p></div></md-input-container></div><md-input-container class=\"md-block\"><label>Degree</label><input ng-model=\"$ctrl.model.degree\" name=\"degree\" required=\"required\" class=\"education-degree\"/><div ng-messages=\"editForm.degree.$error\"><p ng-message=\"required\">Degree is required</p></div></md-input-container><md-input-container class=\"md-block\"><label>Activities</label><textarea ng-model=\"$ctrl.model.activities\" name=\"activities\" required=\"required\" class=\"education-activities\"></textarea><div ng-messages=\"editForm.activities.$error\"><p ng-message=\"required\">Activities is required</p></div></md-input-container><md-button type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
+$templateCache.put("components/profile/education/education.html","<div id=\"sup-j-profile-education-{{ $ctrl.model.field.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"education-degree\">{{$ctrl.model.degree}}</span> degree in <span class=\"education-field\">{{$ctrl.model.field}}</span> at <span class=\"education-name\">{{$ctrl.model.school}}</span></h1><div class=\"education-dates\"><span>From:&nbsp;</span><span class=\"education-start-date\">{{$ctrl.model.startDate | date: \'MM/dd/yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"education-end-date\">{{$ctrl.model.endDate | date: \'MM/dd/yyyy\'}}</span></div><div class=\"education-activities\">{{$ctrl.model.activities}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><label>School Name</label><input id=\"sup-j-education-schoolName\" ng-model=\"$ctrl.model.school\" name=\"school\" autofocus=\"autofocus\" required=\"required\" class=\"education-school\"/><div ng-messages=\"editForm.school.$error\"><p ng-message=\"required\">School name is required</p></div></md-input-container><md-input-container class=\"md-block\"><label>Field</label><input id=\"sup-j-education-field\" ng-model=\"$ctrl.model.field\" name=\"field\" required=\"required\" class=\"education-field\"/><div ng-messages=\"editForm.field.$error\"><p ng-message=\"required\">Your field is required</p></div></md-input-container><div layout=\"row\"><md-input-container class=\"flex\"><label>From</label><md-datepicker id=\"sup-j-education-startDate\" ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" ng-required=\"true\" name=\"startDate\" type=\"date\" md-max-date=\"$ctrl.currentDate\" md-open-on-focus=\"md-open-on-focus\" class=\"education-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><p ng-message=\"required\">Start Date is required</p><p ng-message=\"valid\">Start Date must be a valid date</p><p ng-message=\"maxdate\">Start Date should be less than Today</p></div></md-input-container><md-input-container class=\"flex\"><label>To</label><md-datepicker id=\"sup-j-education-endDate\" ng-model=\"$ctrl.model.endDate\" md-hide-icons=\"calendar\" md-min-date=\"$ctrl.model.startDate\" type=\"date\" name=\"endDate\" md-open-on-focus=\"md-open-on-focus\" class=\"education-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><p ng-message=\"valid\">End Date must be a valid date</p><p ng-message=\"mindate\">End Date should be greater than Start Date</p></div></md-input-container></div><md-input-container class=\"md-block\"><label>Degree</label><input id=\"sup-j-education-degree\" ng-model=\"$ctrl.model.degree\" name=\"degree\" required=\"required\" class=\"education-degree\"/><div ng-messages=\"editForm.degree.$error\"><p ng-message=\"required\">Degree is required</p></div></md-input-container><md-input-container class=\"md-block\"><label>Activities</label><textarea id=\"sup-j-education-activities\" ng-model=\"$ctrl.model.activities\" name=\"activities\" required=\"required\" class=\"education-activities\"></textarea><div ng-messages=\"editForm.activities.$error\"><p ng-message=\"required\">Activities is required</p></div></md-input-container><md-button id=\"sup-j-education-save\" type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button id=\"sup-j-education-cancel\" ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
 $templateCache.put("components/profile/educations/educations.html","<profile-timeline-tile title=\"Education\" icon=\"school\" on-help=\"$ctrl.help($event)\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" add-button-enabled=\"!$ctrl.isInEditMode()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.items.length\" max-items-mobile=\"$ctrl.limitMobile\"><profile-timeline-item ng-repeat=\"education in $ctrl.items | limitTo: $ctrl.limitTo\" year=\"{{education.startDate | date:\'yyyy\'}}\" blocked=\"$ctrl.isBlocked(education)\" fixed-remove-icon=\"$ctrl.isEditing(education)\" on-remove=\"$ctrl.removeItem(education)\" read-only=\"$ctrl.readOnly\"><profile-education education=\"education\" editing=\"$ctrl.isEditing(education)\" on-edit=\"$ctrl.editItem(education)\" on-update=\"$ctrl.updateItem(education)\" on-cancel=\"$ctrl.cancelItem(education)\" read-only=\"$ctrl.readOnly\"></profile-education></profile-timeline-item></profile-timeline-tile>");
 $templateCache.put("components/profile/hobbies/hobbies.html","<profile-tile title=\"Hobbies\" icon=\"favorite_border\" on-help=\"$ctrl.help()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\"><div layout=\"row\" layout-wrap=\"layout-wrap\" class=\"hobbies-content\"><md-chips id=\"sup-j-profile-hobbies\" ng-model=\"$ctrl.user.hobbies\" md-transform-chip=\"$ctrl.newHobby($chip)\" readonly=\"$ctrl.readOnly\" md-on-add=\"$ctrl.save()\" md-on-remove=\"$ctrl.remove($chip)\" placeholder=\"Hobby name\" class=\"hobbies-text\"><md-chip-template><span>{{$chip.name}}</span></md-chip-template></md-chips></div></profile-tile>");
-$templateCache.put("components/profile/languages/languages.html","<profile-tile title=\"Languages\" icon=\"language\" on-help=\"$ctrl.help()\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.user.languageSkills.length\" max-items-mobile=\"$ctrl.limitMobile\" disabled-show-more-button=\"$ctrl.disabledShowMoreButton\" add-button-enabled=\"!$ctrl.disabledShowMoreButton\"><div ng-repeat=\"language in $ctrl.user.languageSkills | limitTo: $ctrl.limitTo\" class=\"language-content\"><md-input-container md-no-float=\"\" class=\"md-block\"><i id=\"sup-j-profile-languages-removeButton-{{ language.name }}\" ng-click=\"$ctrl.removeItem(language, $event)\" class=\"material-icons remove-icon\">clear</i><input id=\"sup-j-profile-language-{{ language.name }}\" type=\"text\" flex=\"grow\" ng-change=\"$ctrl.doUpdate(language); $ctrl.enableShowMoreButton()\" ng-model=\"language.name\" ng-model-options=\"{updateOn: \'blur\'}\" ng-readonly=\"$ctrl.readonly\" aria-label=\"Language name\" required=\"required\" placeholder=\"Language name\" name=\"languageName_{{$index}}\" class=\"single-line\"/><div layout=\"row\" class=\"language-grade-container\"><div ng-repeat=\"level in [1,2,3,4,5]\" ng-click=\"$ctrl.setLevel(language, level)\" ng-show=\"language._id\" class=\"language-grade\"><span ng-class=\"$ctrl.getLevelClass(language, level)\" ng-mouseenter=\"$ctrl.setHover(language, level)\" ng-mouseleave=\"$ctrl.unsetHover(language)\" class=\"empty\"><i class=\"material-icons\">grade</i></span></div></div><div ng-messages=\"languageForm[\'languageName_\'+$index].$error\"><div ng-message=\"required\">Name cannot be empty</div></div></md-input-container></div></profile-tile>");
+$templateCache.put("components/profile/languages/languages.html","<profile-tile title=\"Languages\" icon=\"language\" on-help=\"$ctrl.help()\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.user.languageSkills.length\" max-items-mobile=\"$ctrl.limitMobile\" disabled-show-more-button=\"$ctrl.disabledShowMoreButton\" add-button-enabled=\"!$ctrl.disabledShowMoreButton\"><div ng-repeat=\"language in $ctrl.user.languageSkills | limitTo: $ctrl.limitTo\" class=\"language-content\"><md-input-container md-no-float=\"\" class=\"md-block\"><i id=\"sup-j-profile-languages-removeButton-{{ language.name.split(\' \').join(\'\') }}\" ng-click=\"$ctrl.removeItem(language, $event)\" class=\"material-icons remove-icon\">clear</i><input id=\"sup-j-profile-language-{{ language.name.split(\' \').join(\'\') }}\" type=\"text\" flex=\"grow\" ng-change=\"$ctrl.doUpdate(language); $ctrl.enableShowMoreButton()\" ng-model=\"language.name\" ng-model-options=\"{updateOn: \'blur\'}\" ng-readonly=\"$ctrl.readonly\" aria-label=\"Language name\" required=\"required\" placeholder=\"Language name\" name=\"languageName_{{$index}}\" class=\"single-line\"/><div layout=\"row\" class=\"language-grade-container\"><div ng-repeat=\"level in [1,2,3,4,5]\" ng-click=\"$ctrl.setLevel(language, level)\" ng-show=\"language._id\" class=\"language-grade\"><span ng-class=\"$ctrl.getLevelClass(language, level)\" ng-mouseenter=\"$ctrl.setHover(language, level)\" ng-mouseleave=\"$ctrl.unsetHover(language)\" class=\"empty\"><i class=\"material-icons\">grade</i></span></div></div><div ng-messages=\"languageForm[\'languageName_\'+$index].$error\"><div ng-message=\"required\">Name cannot be empty</div></div></md-input-container></div></profile-tile>");
 $templateCache.put("components/profile/qualificationSummary/qualificationSummary.html","<profile-tile title=\"Qualification Summary\" icon=\"assignment_turned_in\" on-help=\"$ctrl.help($event)\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\"><md-input-container class=\"md-block\"><textarea id=\"sup-j-profile-qualificationSummary\" ng-model=\"$ctrl.user.summaryOfQualification\" ng-disabled=\"$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"Qualification Summary\" class=\"qualification-summary\"></textarea></md-input-container></profile-tile>");
 $templateCache.put("components/profile/skills/skills.html","<profile-tile title=\"Skills\" icon=\"desktop_windows\" on-help=\"$ctrl.help()\" on-add-item=\"$ctrl.addItem()\" on-show-more=\"$ctrl.showMore()\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.user.skillsCloud.length\" max-items-mobile=\"$ctrl.limitMobile\" disabled-show-more-button=\"$ctrl.disabledShowMoreButton\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" id=\"skills-tile\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" add-button-enabled=\"!$ctrl.disabledShowMoreButton\"><div layout=\"row\" layout-align=\"space-between none\" ng-disabled=\"$ctrl.readonly\" ng-repeat=\"skill in $ctrl.user.skillsCloud | limitTo: $ctrl.limitTo\" ng-form=\"skillForm\" class=\"profile-list-item mobile skill-container\"><div flex=\"grow\" layout=\"column\" class=\"skill-slider\"><md-input-container flex=\"flex\" md-no-float=\"\"><input id=\"sup-j-profile-skillName-{{ skill.name.split(\' \').join(\'\') }}\" type=\"text\" ng-change=\"$ctrl.updateItem(skill)\" ng-model=\"skill.name\" name=\"skillName\" ng-disabled=\"$ctrl.readOnly\" ng-model-options=\"{updateOn: \'on blur\'}\" aria-label=\"Skill name\" skills-focus-on=\"$ctrl.focusItem()\" placeholder=\"Skill name\" required=\"required\"/></md-input-container><md-slider-container><md-slider id=\"skill-slider\" min=\"{{$ctrl.min}}\" max=\"{{$ctrl.max}}\" md-discrete=\"\" ng-change=\"$ctrl.updateItem(skill)\" ng-model=\"skill.experienceYears\" ng-hide=\"$ctrl.readOnly\" aria-label=\"skill-level\" name=\"experienceYears\"></md-slider></md-slider-container><div class=\"md-errors-spacer\"></div><div class=\"error-messages\"><div ng-messages=\"skillForm.skillName.$error\" ng-if=\"skillForm.skillName.$touched\"><div ng-message=\"required\">Name cannot be empty</div></div><div ng-messages=\"skillForm.experienceYears.$error\" ng-if=\"skillForm.experienceYears.$touched\"><div ng-message=\"required\">Years cannot be empty</div><div ng-message=\"min\">Years cannot be less than 0</div></div></div></div><md-input-container flex-gt-sm=\"15\" flex=\"20\" class=\"skill-input\"><input id=\"sup-j-profile-skillNumber-{{ skill.name.split(\' \').join(\'\') }}\" type=\"number\" aria-controls=\"skill-slider\" min=\"{{$ctrl.min}}\" max=\"{{$ctrl.max}}\" ng-change=\"$ctrl.updateItem(skill)\" ng-model=\"skill.experienceYears\" ng-disabled=\"$ctrl.readOnly\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 0, \'blur\': 0}}\" aria-label=\"skill-level\" required=\"required\" name=\"experienceYears\"/></md-input-container><i id=\"sup-j-profile-skills-removeButton-{{ skill.name.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.readOnly\" ng-click=\"$ctrl.removeItem(skill)\" class=\"material-icons remove-icon\">clear</i></div><div flex-gt-sm=\"85\" flex=\"80\" layout=\"column\" class=\"skill-years-caption\"><div layout=\"row\" layout-align=\"space-between\"><div flex=\"\" ng-repeat=\"divider in [0, 1, 2, 3, 4]\" class=\"skill-year-divider\"></div></div><div layout=\"row\" layout-align=\"space-between\"><div ng-repeat=\"year in [1, 3, 6, 9, 12, 15]\" class=\"skill-year\">{{year}}</div></div></div></profile-tile>");
-$templateCache.put("components/profile/tile/profileTile.html","<div ng-show=\"$ctrl.locked\" class=\"profile-tile-locker\"></div><div layout=\"row\" layout-align=\"start center\" class=\"profile-tile-header\"><div class=\"profile-tile-icon\"><i class=\"material-icons\">{{$ctrl.icon}}</i></div><div class=\"profile-tile-title\">{{$ctrl.title}}</div><i ng-click=\"$ctrl.onHelp({$event: $event})\" class=\"material-icons profile-tile-help-icon\">help</i></div><div ng-transclude=\"ng-transclude\" class=\"profile-tile-content mobile\"></div><div layout=\"column\"><md-button id=\"sup-j-profile-showMoreButton-{{ $ctrl.title }}\" ng-disabled=\"!$ctrl.addButtonEnabled || $ctrl.locked || $ctrl.disabledShowMoreButton\" ng-class=\"{\'add-button-flex\': $ctrl.addButtonFlex==\'true\'}\" ng-click=\"$ctrl.onShowMore(); $ctrl.changeShowMoreButtonText()\" ng-show=\"$ctrl.showShowMoreButton()\" class=\"profile-add-button md-raised md-primary\">{{$ctrl.showMoreText}}</md-button><md-button id=\"sup-j-profile-addButton-{{ $ctrl.title }}\" ng-disabled=\"!$ctrl.addButtonEnabled || $ctrl.locked\" ng-class=\"{\'add-button-flex\': $ctrl.addButtonFlex==\'true\'}\" ng-click=\"$ctrl.onAddItem()\" class=\"profile-add-button md-raised md-primary\">Add</md-button></div>");
+$templateCache.put("components/profile/tile/profileTile.html","<div ng-show=\"$ctrl.locked\" class=\"profile-tile-locker\"></div><div layout=\"row\" layout-align=\"start center\" class=\"profile-tile-header\"><div class=\"profile-tile-icon\"><i class=\"material-icons\">{{$ctrl.icon}}</i></div><div class=\"profile-tile-title\">{{$ctrl.title}}</div><i ng-click=\"$ctrl.onHelp({$event: $event})\" class=\"material-icons profile-tile-help-icon\">help</i></div><div ng-transclude=\"ng-transclude\" class=\"profile-tile-content mobile\"></div><div layout=\"column\"><md-button id=\"sup-j-profile-showMoreButton-{{ $ctrl.title.split(\' \').join(\'\') }}\" ng-disabled=\"!$ctrl.addButtonEnabled || $ctrl.locked || $ctrl.disabledShowMoreButton\" ng-class=\"{\'add-button-flex\': $ctrl.addButtonFlex==\'true\'}\" ng-click=\"$ctrl.onShowMore(); $ctrl.changeShowMoreButtonText()\" ng-show=\"$ctrl.showShowMoreButton()\" class=\"profile-add-button md-raised md-primary\">{{$ctrl.showMoreText}}</md-button><md-button id=\"sup-j-profile-addButton-{{ $ctrl.title.split(\' \').join(\'\') }}\" ng-disabled=\"!$ctrl.addButtonEnabled || $ctrl.locked\" ng-class=\"{\'add-button-flex\': $ctrl.addButtonFlex==\'true\'}\" ng-click=\"$ctrl.onAddItem()\" class=\"profile-add-button md-raised md-primary\">Add</md-button></div>");
 $templateCache.put("components/profile/timelineItem/timelineItem.html","<div ng-class=\"{\'active\': $ctrl.blocked}\" class=\"timeline-item-blocker\"></div><div class=\"profile-list-item\"><i id=\"sup-j-profile-timeline-removeButton-{{ $ctrl.year }}\" ng-hide=\"$ctrl.readOnly\" ng-click=\"$ctrl.onRemove()\" ng-class=\"{\'fixed\': $ctrl.fixedRemoveIcon}\" class=\"material-icons remove-icon\">clear</i><div class=\"timeline-year\">{{$ctrl.year || \"&nbsp;\"}}</div><div ng-transclude=\"ng-transclude\" class=\"timeline-item-content\"></div></div>");
 $templateCache.put("components/profile/timelineTile/timelineTile.html","<profile-tile title=\"{{$ctrl.title}}\" icon=\"{{$ctrl.icon}}\" on-help=\"$ctrl.onHelp({$event: $event})\" show-add-button=\"{{$ctrl.showAddButton}}\" add-button-flex=\"{{$ctrl.addButtonFlex}}\" add-button-enabled=\"$ctrl.addButtonEnabled\" on-add-item=\"$ctrl.onAddItem()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitItemsMobile\" items-length=\"$ctrl.itemsLength\" max-items-mobile=\"$ctrl.maxItemsMobile\"><div class=\"timeline-bar\"></div><div ng-transclude=\"ng-transclude\" ng-click=\"\" class=\"timeline-tile-content mobile\"></div></profile-tile>");
 $templateCache.put("components/profile/topBar/topBar.html","<div id=\"sup-j-profile-topBar\" layout=\"row\" layout-xs=\"column\" layout-align-xs=\"center center\" flex-wrap=\"\"><img src=\"{{$ctrl.user.picture}}\"/><div layout=\"column\" layout-align-xs=\"center center\" class=\"details\"><div id=\"sup-j-profile-topBar-name\" class=\"name\">{{$ctrl.user.name | uppercase}}		</div><div id=\"sup-j-profile-topBar-city\" class=\"city\">{{$ctrl.user.city || \'[City]\'}}</div><div id=\"sup-j-profile-topBar-position\" class=\"position\"><div><md-chips ng-model=\"$ctrl.userPositions\" md-transform-chip=\"$ctrl.transformChip($chip)\" readonly=\"$ctrl.readOnly\" md-on-add=\"$ctrl.addPosition()\" md-on-remove=\"$ctrl.removePosition($chip)\" md-max-chips=\"5\" md-require-match=\"true\"><md-autocomplete md-disabled=\"$ctrl.readOnly\" md-menu-class=\"position-autocomplete\" ng-hide=\"$ctrl.userPositions.length &gt; 5\" md-search-text=\"$ctrl.positionSearchText\" md-selected-item=\"$ctrl.positionSelectedItem\" md-items=\"item in $ctrl.getAvailablePositions($ctrl.positionSearchText)\" md-item-text=\"item\" placeholder=\"Add new position\"><span md-highlight-text=\"$ctrl.positionSearchText\" md-highlight-flags=\"i\">{{item}}</span></md-autocomplete><md-chip-template><span><strong>{{$chip.name}}		</strong></span></md-chip-template></md-chips></div></div></div><span flex=\"\"></span><div hide-xs=\"\" hide-sm=\"\" class=\"logo\"></div></div>");
-$templateCache.put("components/profile/workingExperience/workingExperience.html","<div id=\"sup-j-profile-workingExperience-{{ $ctrl.model.position }}\" ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"experience-position\">{{$ctrl.model.position}}</span> at <span class=\"experience-company\">{{$ctrl.model.company}}</span></h1><div class=\"experience-dates\"><span>From:&nbsp;</span><span class=\"experience-start-date\">{{$ctrl.model.startDate | date: \'MM/dd/yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"experience-end-date\">{{$ctrl.model.endDate | date: \'MM/dd/yyyy\'}}</span></div><div class=\"experience-description\">{{$ctrl.model.activityDescription}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><label>Company</label><input name=\"company\" ng-model=\"$ctrl.model.company\" autofocus=\"autofocus\" required=\"required\" class=\"experience-company\"/><div ng-messages=\"editForm.company.$error\"><div ng-message=\"required\">Company name can not be empty</div></div></md-input-container><md-input-container class=\"md-block\"><label>Position</label><input name=\"position\" ng-model=\"$ctrl.model.position\" required=\"required\" class=\"experience-position\"/><div ng-messages=\"editForm.position.$error\"><div ng-message=\"required\">Position can not be empty</div></div></md-input-container><div layout=\"row\"><md-input-container class=\"flex\"><label>From</label><md-datepicker name=\"startDate\" ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" md-max-date=\"$ctrl.currentDate\" ng-required=\"true\" md-open-on-focus=\"md-open-on-focus\" class=\"experience-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><div ng-message=\"required\">Start Date cannot be empty</div><div ng-message=\"valid\">Start Date must be a valid date</div><div ng-message=\"maxdate\">Start Date must be less than today</div></div></md-input-container><md-input-container class=\"flex\"><label>To</label><md-datepicker name=\"endDate\" ng-model=\"$ctrl.model.endDate\" md-hide-icons=\"calendar\" md-min-date=\"$ctrl.model.startDate\" md-open-on-focus=\"md-open-on-focus\" class=\"experience-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><div ng-message=\"valid\">End Date must be a valid date</div><div ng-message=\"mindate\">End Date should be greater than Start Date</div></div></md-input-container></div><md-input-container class=\"md-block\"><label>Description</label><textarea name=\"description\" ng-model=\"$ctrl.model.activityDescription\" required=\"required\" class=\"experience-description\"></textarea><div ng-messages=\"editForm.description.$error\"><div ng-message=\"required\">Description can not be empty</div></div></md-input-container><md-button type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
+$templateCache.put("components/profile/workingExperience/workingExperience.html","<div id=\"sup-j-profile-workingExperience-{{ $ctrl.model.position.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"experience-position\">{{$ctrl.model.position}}</span> at <span class=\"experience-company\">{{$ctrl.model.company}}</span></h1><div class=\"experience-client\"><span class=\"experience-client\">{{$ctrl.model.client}}</span></div><div class=\"experience-project\"><span class=\"experience-project\">{{$ctrl.model.project}}</span></div><div class=\"experience-dates\"><span>From:&nbsp;</span><span class=\"experience-start-date\">{{$ctrl.model.startDate | date: \'MM/dd/yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"experience-end-date\">{{$ctrl.model.endDate | date: \'MM/dd/yyyy\'}}</span></div><div class=\"experience-description\">{{$ctrl.model.activityDescription}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><md-checkbox ng-model=\"$ctrl.model.isAvenueCode\" aria-label=\"Is Avenue Code\" ng-change=\"$ctrl.fillAvenueCodeCompany()\">Is Avenue Code</md-checkbox></md-input-container><md-input-container class=\"md-block\"><label>Company</label><input id=\"sup-j-workingExperience-company\" name=\"company\" ng-model=\"$ctrl.model.company\" ng-readonly=\"$ctrl.model.isAvenueCode\" autofocus=\"autofocus\" required=\"required\" class=\"experience-company\"/><div ng-messages=\"editForm.company.$error\"><div ng-message=\"required\">Company name can not be empty</div></div></md-input-container><md-input-container ng-if=\"$ctrl.model.isAvenueCode\" class=\"md-block\"><label>Client</label><input name=\"client\" ng-model=\"$ctrl.model.client\" required=\"required\" class=\"experience-client\"/></md-input-container><md-input-container ng-if=\"$ctrl.model.isAvenueCode\" class=\"md-block\"><label>Project</label><input name=\"project\" ng-model=\"$ctrl.model.project\" required=\"required\" class=\"experience-project\"/></md-input-container><md-input-container class=\"md-block\"><label>Position</label><input id=\"sup-j-workingExperience-position\" name=\"position\" ng-model=\"$ctrl.model.position\" required=\"required\" class=\"experience-position\"/><div ng-messages=\"editForm.position.$error\"><div ng-message=\"required\">Position can not be empty</div></div></md-input-container><div layout=\"row\"><md-input-container class=\"flex\"><label>From</label><md-datepicker id=\"sup-j-workingExperience-startDate\" name=\"startDate\" ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" md-max-date=\"$ctrl.currentDate\" ng-required=\"true\" md-open-on-focus=\"md-open-on-focus\" class=\"experience-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><div ng-message=\"required\">Start Date cannot be empty</div><div ng-message=\"valid\">Start Date must be a valid date</div><div ng-message=\"maxdate\">Start Date must be less than today</div></div></md-input-container><md-input-container class=\"flex\"><label>To</label><md-datepicker id=\"sup-j-workingExperience-endDate\" name=\"endDate\" ng-model=\"$ctrl.model.endDate\" md-hide-icons=\"calendar\" md-min-date=\"$ctrl.model.startDate\" md-open-on-focus=\"md-open-on-focus\" class=\"experience-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><div ng-message=\"valid\">End Date must be a valid date</div><div ng-message=\"mindate\">End Date should be greater than Start Date</div></div></md-input-container></div><md-input-container class=\"md-block\"><label>Description</label><textarea id=\"sup-j-workingExperience-description\" name=\"description\" ng-model=\"$ctrl.model.activityDescription\" required=\"required\" class=\"experience-description\"></textarea><div ng-messages=\"editForm.description.$error\"><div ng-message=\"required\">Description can not be empty</div></div></md-input-container><md-button id=\"sup-j-workingExperience-save\" type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button id=\"sup-j-workingExperience-cancel\" ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
 $templateCache.put("components/profile/workingExperiences/workingExperiences.html","<profile-timeline-tile title=\"Working Experiences\" icon=\"card_travel\" on-help=\"$ctrl.help($event)\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" add-button-enabled=\"!$ctrl.isInEditMode()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.items.length\" max-items-mobile=\"$ctrl.limitMobile\"><profile-timeline-item ng-repeat=\"experience in $ctrl.items | limitTo: $ctrl.limitTo\" year=\"{{experience.startDate | date:\'yyyy\'}}\" blocked=\"$ctrl.isBlocked(experience)\" fixed-remove-icon=\"$ctrl.isEditing(experience)\" on-remove=\"$ctrl.removeItem(experience)\" read-only=\"$ctrl.readOnly\"><profile-working-experience experience=\"experience\" editing=\"$ctrl.isEditing(experience)\" on-edit=\"$ctrl.editItem(experience)\" on-update=\"$ctrl.updateItem(experience)\" on-cancel=\"$ctrl.cancelItem(experience)\" read-only=\"$ctrl.readOnly\"></profile-working-experience></profile-timeline-item></profile-timeline-tile>");}]);
