@@ -19,10 +19,8 @@ router.get('/me', auth.isAuthenticated(), controller.me);
 router.get('/:username', controller.show);
 
 //Export Resume
-router.get('/:username/resume-doc', controller.exportResume);
-
-// Old endpoint to save - Temporary
-//router.put('/', auth.isAuthenticated(), controller.update);
+router.get('/:username/resume-doc', controller.exportDOCX);
+router.get('/:username/resume-pdf', controller.exportPDF);
 
 // New endpoints
 router.get('/skill', auth.isAuthenticated(), controller.searchBySkill);

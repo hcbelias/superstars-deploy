@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.isAuthenticated = isAuthenticated;
 exports.hasRole = hasRole;
 exports.signToken = signToken;
+exports.signTokenWithSSO = signTokenWithSSO;
 exports.setTokenCookie = setTokenCookie;
 exports.hasPermissionToEdit = hasPermissionToEdit;
 exports.hasPermissionToAddEntity = hasPermissionToAddEntity;
@@ -90,7 +91,21 @@ function hasRole(roleRequired) {
  * Returns a jwt token signed by the app secret
  */
 function signToken(id, role) {
-  return _jsonwebtoken2.default.sign({ _id: id, role: role }, _environment2.default.secrets.session, {
+  return _jsonwebtoken2.default.sign({
+    _id: id,
+    role: role
+  }, _environment2.default.secrets.session, {
+    expiresIn: 60 * 60 * 5
+  });
+}
+
+function signTokenWithSSO(id, role, token, email) {
+  return _jsonwebtoken2.default.sign({
+    _id: id,
+    role: role,
+    token: token,
+    email: email
+  }, _environment2.default.secrets.session, {
     expiresIn: 60 * 60 * 5
   });
 }
@@ -102,8 +117,12 @@ function setTokenCookie(req, res) {
   if (!req.user) {
     return res.status(404).send('It looks like you aren\'t logged in, please try again.');
   }
-  var token = signToken(req.user._id, req.user.role);
-  res.cookie('token', token);
+
+  if (req.authInfo && req.authInfo.ssoToken && req.authInfo.ssoToken.token) {
+    res.cookie('ssotoken', signTokenWithSSO(req.user._id, req.user.role, req.authInfo.ssoToken.token, req.user.email));
+  }
+
+  res.cookie('token', signToken(req.user._id, req.user.role));
   res.redirect('/');
 }
 

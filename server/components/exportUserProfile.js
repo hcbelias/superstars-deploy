@@ -4,21 +4,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jszip = require('jszip');
+var _underscore = require('underscore');
 
-var _jszip2 = _interopRequireDefault(_jszip);
-
-var _docxtemplater = require('docxtemplater');
-
-var _docxtemplater2 = _interopRequireDefault(_docxtemplater);
-
-var _fs = require('fs');
-
-var _fs2 = _interopRequireDefault(_fs);
+var _underscore2 = _interopRequireDefault(_underscore);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var TEMPLATE_PATH = __dirname + '/../views/resume/template.docx';
+var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+var LANGUAGE_LEVELS = ['Elementary Proficiency', 'Limited Working Proficiency', 'Minimum Professional Proficiency', 'Full Professional Proficiency', 'Native or Bilingual'];
 
 function _sortResults(arr, field, asc) {
   arr = arr.sort(function (el1, el2) {
@@ -30,36 +23,8 @@ function _sortResults(arr, field, asc) {
   });
 }
 
-function _getPeriodDateDescription(startDate, endDate) {
-  var monthEnd = void 0,
-      yearEnd = void 0,
-      monthStart = void 0,
-      yearStart = void 0;
-  var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
-  var dateFormated = '';
-
-  if (startDate) {
-    monthStart = startDate.getMonth();
-    yearStart = startDate.getFullYear();
-
-    if (endDate) {
-      monthEnd = endDate.getMonth();
-      yearEnd = endDate.getFullYear();
-
-      dateFormated = yearStart === yearEnd ? months[monthStart] + ' - ' + months[monthEnd] + ' ' + yearStart : months[monthStart] + ' ' + yearStart + ' - ' + months[monthEnd] + ' ' + yearEnd;
-    } else {
-      dateFormated = 'Since ' + months[monthStart] + ' ' + yearStart;
-    }
-  }
-
-  return dateFormated;
-}
-
-function _getSkillDescription(skill) {
-  var name = skill.name,
-      experienceYears = skill.experienceYears;
-
-  var skillFromated = skill.experienceYears > 1 ? experienceYears + ' years experience: ' + name : experienceYears + ' year experience: ' + name;
+function _getSkillDescription(years) {
+  var skillFromated = years > 1 ? years + ' years experience: ' : years === 1 ? years + ' year experience: ' : 'Less than 1 year experience: ';
 
   return skillFromated;
 }
@@ -68,15 +33,59 @@ function _getLanguageDescription(language) {
   var name = language.name,
       level = language.level;
 
-  var languageLevels = ['Elementary Proficiency', 'Limited Working Proficiency', 'Minimum Professional Proficiency', 'Full Professional Proficiency', 'Native or Bilingual'];
 
-  return name + ': ' + languageLevels[level - 1];
+  return name + ': ' + LANGUAGE_LEVELS[level - 1];
 }
 
 function _setPeriodDate(arr) {
   arr.forEach(function (exp) {
-    return exp.periodDate = _getPeriodDateDescription(exp.startDate, exp.endDate);
+    return exp.periodDate = _formatDateDisplay(exp.startDate, exp.endDate);
   });
+}
+
+function _formatDateDisplay(startDate, endDate) {
+  if (endDate) {
+    if (startDate.getFullYear() === endDate.getFullYear()) {
+      return MONTHS[startDate.getMonth()] + ' ' + startDate.getFullYear() + ' - ' + MONTHS[endDate.getMonth()] + ' ' + endDate.getFullYear();
+    } else {
+      return startDate.getFullYear() + ' - ' + endDate.getFullYear();
+    }
+  } else {
+    return 'Since ' + MONTHS[startDate.getMonth()] + ' ' + startDate.getFullYear();
+  }
+}
+
+function _getSmallestACDate(experiences) {
+  var date = experiences[0].startDate;
+  var i = 0;
+  for (; i < experiences.length; i++) {
+    if (experiences[i].startDate < date) {
+      date = experiences[i].startDate;
+    }
+  }
+  return date;
+}
+
+function formatSkillsData(skillsCloud) {
+  skillsCloud = skillsCloud.filter(function (skill) {
+    return skill !== null;
+  });
+  var result = [];
+  var dictionary = _underscore2.default.groupBy(skillsCloud, 'experienceYears');
+
+  for (var prop in dictionary) {
+    console.log(prop);
+    var iterator = dictionary[prop];
+    var values = _getSkillDescription(parseInt(prop));
+    for (var i = 0; i < iterator.length; i++) {
+      values += iterator[i].name;
+      if (i < iterator.length - 1) {
+        values += ', ';
+      }
+    }
+    result.push({ 'description': values });
+  }
+  return result;
 }
 
 function _getResumeInfo(user) {
@@ -104,15 +113,24 @@ function _getResumeInfo(user) {
   _setPeriodDate(certifications);
   _setPeriodDate(education);
 
-  if (avenueCodeExperiences.length) {
-    ACdate = avenueCodeExperiences[0].periodDate;
+  if (avenueCodeExperiences.length && avenueCodeExperiences.length > 0) {
+    var smallestDate = _getSmallestACDate(avenueCodeExperiences);
+    ACdate = _formatDateDisplay(smallestDate);
   }
 
-  skillsCloud.forEach(function (skill) {
-    return skill.description = _getSkillDescription(skill);
+  languageSkills = languageSkills.filter(function (language) {
+    return language !== null;
   });
   languageSkills.forEach(function (language) {
-    return language.description = _getLanguageDescription(language);
+    if (language) {
+      language.description = _getLanguageDescription(language);
+    }
+  });
+
+  education.forEach(function (ed) {
+    if (!ed.activities) {
+      ed.activities = '';
+    }
   });
 
   return {
@@ -121,7 +139,7 @@ function _getResumeInfo(user) {
     summaryOfQualification: summaryOfQualification,
     certifications: certifications,
     languageSkills: languageSkills,
-    skills: skillsCloud,
+    skills: formatSkillsData(skillsCloud),
     groupedExperiences: {
       ac: avenueCodeExperiences,
       others: otherExperiences
@@ -134,14 +152,14 @@ function _getResumeInfo(user) {
     showExperienceSection: experiences.length ? true : false,
     showSkillCloudSection: skillsCloud.length ? true : false,
     showLanguageSkillSection: languageSkills.length ? true : false,
-    showAvenueCodeLabelExperienceSection: avenueCodeExperiences.length ? true : false
+    showAvenueCodeLabelExperienceSection: avenueCodeExperiences.length ? true : false,
+    months: MONTHS,
+    languageLevels: LANGUAGE_LEVELS,
+    formatDisplayDate: _formatDateDisplay
   };
 }
 
-function exportToDocx(user) {
-  var template = _fs2.default.readFileSync(TEMPLATE_PATH);
-  var zip = new _jszip2.default(template);
-  var docx = new _docxtemplater2.default().loadZip(zip);
+function generateResumeData(user) {
   var education = user.education,
       experiences = user.experiences,
       certifications = user.certifications;
@@ -151,11 +169,8 @@ function exportToDocx(user) {
   _sortResults(experiences, 'startDate', false);
   _sortResults(certifications, 'startDate', false);
 
-  docx.setData(_getResumeInfo(user));
-  docx.render();
-
-  return docx.getZip().generate({ type: 'nodebuffer' });
+  return _getResumeInfo(user);
 }
 
-exports.default = { exportToDocx: exportToDocx };
+exports.default = { generateResumeData: generateResumeData };
 //# sourceMappingURL=../components/exportUserProfile.js.map

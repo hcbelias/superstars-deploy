@@ -39,7 +39,8 @@ exports.updateTwitter = updateTwitter;
 exports.updateLinkedin = updateLinkedin;
 exports.updateSkype = updateSkype;
 exports.authCallback = authCallback;
-exports.exportResume = exportResume;
+exports.exportDOCX = exportDOCX;
+exports.exportPDF = exportPDF;
 
 var _exportUserProfile = require('../../components/exportUserProfile');
 
@@ -61,7 +62,25 @@ var _jsonwebtoken = require('jsonwebtoken');
 
 var _jsonwebtoken2 = _interopRequireDefault(_jsonwebtoken);
 
+var _wkhtmltopdf = require('wkhtmltopdf');
+
+var _wkhtmltopdf2 = _interopRequireDefault(_wkhtmltopdf);
+
+var _jszip = require('jszip');
+
+var _jszip2 = _interopRequireDefault(_jszip);
+
+var _docxtemplater = require('docxtemplater');
+
+var _docxtemplater2 = _interopRequireDefault(_docxtemplater);
+
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var TEMPLATE_PATH = __dirname + '/../../components/template.docx';
 
 var userWithPropertyNotFoundMsg = 'User with this property not found';
 var userNotFoundMsg = 'User not found';
@@ -233,15 +252,29 @@ function getQuerySearchAllFields(querystring) {
   return query;
 }
 
+function getQuerySearchByName(querystring) {
+  var query = {};
+
+  if ((0, _keys2.default)(querystring).length !== 0) {
+    query = {
+      name: {
+        $regex: '.*' + querystring.q + '.*',
+        $options: 'i'
+      }
+    };
+  }
+
+  return query;
+}
+
 /**
  * Get list of users
  * restriction: 'admin'
  */
 function index(req, res) {
-  var query = getQuerySearchAllFields(req.query),
-      results = [];
+  var query = getQuerySearchByName(req.query);
 
-  return _user2.default.find().or(query).exec().then(respondWithBasicProfileResultList(res)).catch(handleError(res));
+  return _user2.default.find(query).sort({ name: 1 }).exec().then(respondWithBasicProfileResultList(res)).catch(handleError(res));
 }
 
 /**
@@ -449,7 +482,6 @@ function updateSimpleField(res, propertyName, propertyValue) {
 function findUserAndUpdateProperty(req, res, action, propertyName) {
   var username = req.params.username;
   var propertyValue = req.body.data;
-  console.log('Property Value - ' + propertyValue);
   return findUserByUsername(username).then(handleUserNotFound(res)).then(action(res, propertyName, propertyValue)).catch(handleError(res));
 }
 
@@ -485,15 +517,16 @@ function authCallback(req, res, next) {
 }
 
 /**
- * Export PDF Resume
+ * Export DOCX Resume
  */
 
-function exportResume(req, res) {
+function exportDOCX(req, res) {
   findUserByUsername(req.params.username).then(function (user) {
     if (!user) {
       return res.status(404).end();
     }
-    var buffer = _exportUserProfile2.default.exportToDocx(user);
+
+    var buffer = generateDOCX(user);
 
     res.setHeader('Content-disposition', 'attachment; filename=resume-' + user.username + '.docx');
 
@@ -502,6 +535,47 @@ function exportResume(req, res) {
     console.error('Error generating user report: ' + err);
     return res.status(400).end();
   });
+}
+
+function generateDOCX(user) {
+  var template = _fs2.default.readFileSync(TEMPLATE_PATH);
+  var zip = new _jszip2.default(template);
+  var docx = new _docxtemplater2.default().loadZip(zip);
+
+  docx.setData(_exportUserProfile2.default.generateResumeData(user));
+  docx.render();
+
+  return docx.getZip().generate({ type: 'nodebuffer' });
+}
+
+function exportPDF(req, res) {
+  findUserByUsername(req.params.username).then(handleUserNotFound(res)).then(renderHTMLToPDF(res));
+}
+
+function renderHTMLToPDF(res) {
+  return function (user) {
+    var resumeData = _exportUserProfile2.default.generateResumeData(user);
+    console.log(resumeData);
+    res.locals = resumeData;
+    res.render("resume/resume", generatePDF(res));
+  };
+}
+
+function generatePDF(res) {
+  return function (err, html) {
+    if (err) {
+      console.error('Error generating user report: ' + err);
+    } else {
+      var pdf = true; //debugging purpose
+      if (pdf) {
+        // Set content type of response
+        res.setHeader('Content-Type', 'application/pdf');
+        return (0, _wkhtmltopdf2.default)(html).pipe(res);
+      } else {
+        return res.send(html);
+      }
+    }
+  };
 }
 
 /**

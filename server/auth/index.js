@@ -23,12 +23,10 @@ var _user2 = _interopRequireDefault(_user);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Passport Configuration
-require('./local/passport').setup(_user2.default, _environment2.default);
 require('./google/passport').setup(_user2.default, _environment2.default);
 
 var router = _express2.default.Router();
 
-router.use('/local', require('./local').default);
 router.use('/google', require('./google').default);
 
 exports.default = router;

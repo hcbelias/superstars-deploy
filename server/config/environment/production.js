@@ -13,6 +13,7 @@ module.exports = {
   // MongoDB connection options
   mongo: {
     uri: process.env.MONGOLAB_URI || 'mongodb://localhost/superstars'
-  }
+  },
+  ssoUrl: 'http://sso.avenuecode.io/api/app/ac-superstars/loginByToken'
 };
 //# sourceMappingURL=../../config/environment/production.js.map
