@@ -124,6 +124,7 @@ function respondWithBasicProfileResultList(res, statusCode) {
     for (var i = 0; i < users.length; i++) {
       results.push(users[i].profile);
     }
+
     return res.status(200).json(results);
   };
 }

@@ -18,6 +18,6 @@ module.exports = {
       }
     }
   },
-  ssoUrl: 'http://sso.avenuecode.io/api/app/ac-superstars-local/loginByToken'
+  ssoUrl: 'http://sso.avenuecode.io/api/ac-superstars-local/loginByToken'
 };
 //# sourceMappingURL=../../config/environment/test.js.map

@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.isAuthenticated = isAuthenticated;
 exports.hasRole = hasRole;
 exports.signToken = signToken;
-exports.signTokenWithSSO = signTokenWithSSO;
 exports.setTokenCookie = setTokenCookie;
 exports.hasPermissionToEdit = hasPermissionToEdit;
 exports.hasPermissionToAddEntity = hasPermissionToAddEntity;
@@ -99,17 +98,6 @@ function signToken(id, role) {
   });
 }
 
-function signTokenWithSSO(id, role, token, email) {
-  return _jsonwebtoken2.default.sign({
-    _id: id,
-    role: role,
-    token: token,
-    email: email
-  }, _environment2.default.secrets.session, {
-    expiresIn: 60 * 60 * 5
-  });
-}
-
 /**
  * Set token cookie directly for oAuth strategies
  */
@@ -119,7 +107,7 @@ function setTokenCookie(req, res) {
   }
 
   if (req.authInfo && req.authInfo.ssoToken && req.authInfo.ssoToken.token) {
-    res.cookie('ssotoken', signTokenWithSSO(req.user._id, req.user.role, req.authInfo.ssoToken.token, req.user.email));
+    res.cookie('ssotoken', req.authInfo.ssoToken.token);
   }
 
   res.cookie('token', signToken(req.user._id, req.user.role));

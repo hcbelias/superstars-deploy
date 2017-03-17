@@ -64,6 +64,7 @@ function setup(User, config) {
     var endpoint = config.ssoUrl + '?access_token=' + accessToken;
 
     (0, _request2.default)(endpoint, function (error, response, body) {
+      console.log('SSO endpoint: ' + endpoint);
       console.log('SSO error: ' + error);
       console.log('SSO response: ' + response.statusCode + ' - ' + response.statusMessage);
 
