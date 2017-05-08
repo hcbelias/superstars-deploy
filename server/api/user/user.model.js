@@ -194,7 +194,8 @@ var UserSchema = new _mongoose.Schema({
 }, {
   toJSON: {
     virtuals: true
-  }
+  },
+  timestamps: true
 });
 
 /**
@@ -233,7 +234,9 @@ UserSchema.virtual('completeProfile').get(function () {
     'aboutMe': this.aboutMe,
     'skillsCloud': this.skillsCloud,
     'experiences': this.experiences,
-    'hobbies': this.hobbies
+    'hobbies': this.hobbies,
+    'updatedAt': this.updatedAt,
+    'createdAt': this.createdAt
   };
 });
 
@@ -256,7 +259,7 @@ UserSchema.virtual('token').get(function () {
 });
 
 UserSchema.virtual('profileComplete').get(function () {
-  return null !== this.aboutMe && '' !== this.aboutMe.trim() && null !== this.social.skype && '' !== this.social.skype.trim() && null !== this.summaryOfQualification && '' !== this.summaryOfQualification.trim();
+  return null !== this.aboutMe && '' !== this.aboutMe.trim() && null !== this.social.skype && '' !== this.social.skype.trim() && null !== this.summaryOfQualification && '' !== this.summaryOfQualification.trim() && null !== this.positions && this.positions.length > 0;
 });
 
 /**

@@ -14,6 +14,6 @@ module.exports = {
   mongo: {
     uri: process.env.MONGOLAB_URI || 'mongodb://localhost/superstars'
   },
-  ssoUrl: 'http://sso.avenuecode.io/api/ac-superstars/loginByToken'
+  ssoUrl: process.env.SSO_URI || 'http://sso.avenuecode.com/api/ac-superstars/loginByToken'
 };
 //# sourceMappingURL=../../config/environment/production.js.map

@@ -106,7 +106,7 @@ function _getResumeInfo(user) {
   });
   var ACdate = void 0;
 
-  _sortResults(avenueCodeExperiences, 'startDate', true);
+  _sortResults(avenueCodeExperiences, 'startDate', false);
 
   _setPeriodDate(avenueCodeExperiences);
   _setPeriodDate(otherExperiences);
@@ -159,15 +159,37 @@ function _getResumeInfo(user) {
   };
 }
 
+function _formatLineBreaks(model) {
+  var aboutMeXML_prefix = '<w:p><w:r><w:rPr><w:i/><w:iCs/><w:color w:val="A6A6A6"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:u w:color="A6A6A6"/></w:rPr><w:t>',
+      XML_prefix = '<w:p><w:r><w:t>',
+      XML_sufix = '</w:t></w:r></w:p>';
+  if (typeof model.aboutMe !== 'undefined') {
+    model.aboutMe = aboutMeXML_prefix + model.aboutMe.replace(/(\r\n|\n|\r)/gm, '<w:br/>') + XML_sufix;
+  }
+
+  if (typeof model.summaryOfQualification !== 'undefined') {
+    model.summaryOfQualification = XML_prefix + model.summaryOfQualification.replace(/(\r\n|\n|\r)/gm, '<w:br/>') + XML_sufix;
+  }
+
+  _underscore2.default.forEach(model.experiences, function (item) {
+    item.activityDescription = item.activityDescription ? XML_prefix + item.activityDescription.replace(/(\r\n|\n|\r)/gm, '<w:br/>') + XML_sufix : '';
+  });
+
+  return model;
+}
+
 function generateResumeData(user) {
-  var education = user.education,
-      experiences = user.experiences,
-      certifications = user.certifications;
+  var _user = user,
+      education = _user.education,
+      experiences = _user.experiences,
+      certifications = _user.certifications;
 
 
-  _sortResults(education, 'startDate', true);
+  _sortResults(education, 'startDate', false);
   _sortResults(experiences, 'startDate', false);
   _sortResults(certifications, 'startDate', false);
+
+  user = _formatLineBreaks(user);
 
   return _getResumeInfo(user);
 }
