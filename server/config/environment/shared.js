@@ -20,7 +20,15 @@ exports = module.exports = {
     }
   },
   cookies: {
-    'error-login': 'error-message-invalid-account'
+    'invalidAccount': 'error-message-invalid-account',
+    'emptyReminder': 'first-access-main-page'
+  },
+  languageLevels: {
+    1: 'Elementary Proficiency',
+    2: 'Limited Proficiency',
+    3: 'Professional Proficiency',
+    4: 'Full Professional Proficiency',
+    5: 'Native or Bilingual Proficiency'
   }
 
 };

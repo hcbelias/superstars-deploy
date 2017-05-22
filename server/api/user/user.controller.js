@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -34,6 +30,8 @@ exports.deleteCertification = deleteCertification;
 exports.createCertification = createCertification;
 exports.deleteHobby = deleteHobby;
 exports.createHobby = createHobby;
+exports.deletePosition = deletePosition;
+exports.createPosition = createPosition;
 exports.updateAboutMe = updateAboutMe;
 exports.updateSummary = updateSummary;
 exports.updateFacebook = updateFacebook;
@@ -41,6 +39,12 @@ exports.updateTwitter = updateTwitter;
 exports.updateLinkedin = updateLinkedin;
 exports.updateSkype = updateSkype;
 exports.authCallback = authCallback;
+exports.exportDOCX = exportDOCX;
+exports.exportPDF = exportPDF;
+
+var _exportUserProfile = require('../../components/exportUserProfile');
+
+var _exportUserProfile2 = _interopRequireDefault(_exportUserProfile);
 
 var _user = require('./user.model');
 
@@ -58,9 +62,25 @@ var _jsonwebtoken = require('jsonwebtoken');
 
 var _jsonwebtoken2 = _interopRequireDefault(_jsonwebtoken);
 
+var _wkhtmltopdf = require('wkhtmltopdf');
+
+var _wkhtmltopdf2 = _interopRequireDefault(_wkhtmltopdf);
+
+var _jszip = require('jszip');
+
+var _jszip2 = _interopRequireDefault(_jszip);
+
+var _docxtemplater = require('docxtemplater');
+
+var _docxtemplater2 = _interopRequireDefault(_docxtemplater);
+
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Mongo = require('mongodb');
+var TEMPLATE_PATH = __dirname + '/../../components/template.docx';
 
 var userWithPropertyNotFoundMsg = 'User with this property not found';
 var userNotFoundMsg = 'User not found';
@@ -70,6 +90,7 @@ var skillProperty = 'skillsCloud';
 var experienceProperty = 'experiences';
 var languageProperty = 'languageSkills';
 var hobbyProperty = 'hobbies';
+var positionProperty = 'positions';
 var educationProperty = 'education';
 var certificationProperty = 'certifications';
 var aboutMeProperty = 'aboutMe';
@@ -80,7 +101,9 @@ var skypeContactProperty = 'skype';
 var linkedinContactProperty = 'linkedIn';
 
 function findUserByUsername(username) {
-  return _user2.default.findOne({ username: username }).exec();
+  return _user2.default.findOne({
+    username: username
+  }).exec();
 }
 
 function respondWithBasicProfileResult(res, statusCode) {
@@ -101,6 +124,7 @@ function respondWithBasicProfileResultList(res, statusCode) {
     for (var i = 0; i < users.length; i++) {
       results.push(users[i].profile);
     }
+
     return res.status(200).json(results);
   };
 }
@@ -143,16 +167,16 @@ function handleError(res, statusCode) {
   };
 }
 
-function addQuerySearchSkill(queryTerms, searchRegExp) {
-  queryTerms.push({
+function addQuerySearchSkill(searchRegExp) {
+  return {
     skillsCloud: {
       $elemMatch: {
-        skill: {
+        name: {
           $regex: searchRegExp
         }
       }
     }
-  });
+  };
 }
 
 function getQuerySearchSkill(querystring) {
@@ -160,15 +184,16 @@ function getQuerySearchSkill(querystring) {
       searchTerms = void 0,
       queryTerms = [],
       searchRegExp = void 0;
-
   //Check if there are query strings
   if ((0, _keys2.default)(querystring).length !== 0) {
     searchTerms = querystring.q.split(' ');
     for (var i = 0; i < searchTerms.length; i++) {
       searchRegExp = new RegExp('.*' + searchTerms[i] + '.*', 'i');
-      addQuerySearchSkill(queryTerms, searchRegExp);
+      queryTerms.push(addQuerySearchSkill(searchRegExp));
     }
-    query = { $or: queryTerms };
+    query = {
+      $or: queryTerms
+    };
   } else {
     query = null;
   }
@@ -180,13 +205,13 @@ function getQuerySearchAllFields(querystring) {
       searchTerms = void 0,
       queryTerms = [],
       searchRegExp = void 0;
-
   //Check if there are query strings
   if ((0, _keys2.default)(querystring).length !== 0) {
     searchTerms = querystring.q.split(' ');
     for (var i = 0; i < searchTerms.length; i++) {
       searchRegExp = new RegExp('.*' + searchTerms[i] + '.*', 'i');
-      addQuerySearchSkill(queryTerms, searchRegExp);
+
+      queryTerms.push(addQuerySearchSkill(searchRegExp));
       queryTerms.push({
         name: {
           $regex: searchRegExp
@@ -221,8 +246,25 @@ function getQuerySearchAllFields(querystring) {
         }
       });
     }
-    query = { $or: queryTerms };
+    query = {
+      $or: queryTerms
+    };
   }
+  return query;
+}
+
+function getQuerySearchByName(querystring) {
+  var query = {};
+
+  if ((0, _keys2.default)(querystring).length !== 0) {
+    query = {
+      name: {
+        $regex: '.*' + querystring.q + '.*',
+        $options: 'i'
+      }
+    };
+  }
+
   return query;
 }
 
@@ -231,10 +273,9 @@ function getQuerySearchAllFields(querystring) {
  * restriction: 'admin'
  */
 function index(req, res) {
-  var query = getQuerySearchAllFields(req.query),
-      results = [];
+  var query = getQuerySearchByName(req.query);
 
-  return _user2.default.find().or(query).exec().then(respondWithBasicProfileResultList(res)).catch(handleError(res));
+  return _user2.default.find(query).sort({ name: 1 }).exec().then(respondWithBasicProfileResultList(res)).catch(handleError(res));
 }
 
 /**
@@ -254,7 +295,11 @@ function show(req, res, next) {
 function update(req, res, next) {
   var username = req.body.username;
 
-  return _user2.default.findOneAndUpdate({ username: username }, req.body, { new: true }).exec().then(respondWithCompleteProfileResult(res)).catch(function (err) {
+  return _user2.default.findOneAndUpdate({
+    username: username
+  }, req.body, {
+    new: true
+  }).exec().then(respondWithCompleteProfileResult(res)).catch(function (err) {
     return next(err);
   });
 }
@@ -264,39 +309,42 @@ function update(req, res, next) {
  */
 function me(req, res, next) {
   var userId = req.user._id;
-  return _user2.default.findOne({ _id: userId }).exec().then(respondWithBasicProfileResult(res)).catch(function (err) {
+  return _user2.default.findOne({
+    _id: userId
+  }).exec().then(respondWithBasicProfileResult(res)).catch(function (err) {
     return next(err);
   });
 }
 
 /**
-* Search user by skill
-*/
+ * Search user by skill
+ */
 function searchBySkill(req, res, next) {
   var query = getQuerySearchSkill(req.query);
   if (!query) {
     return res.status(200).json([]); // if none skill is passed, we dont return users
   }
-  console.log((0, _stringify2.default)(query));
   return _user2.default.find(query).exec().then(respondWithBasicProfileResultList(res)).catch(handleError(res));
 }
 
 //  NEW ENDPOINTS AND AUX FUNCTIONS
 
 function getErrorObject(error) {
-  return { "error": error };
+  return {
+    "error": error
+  };
 }
 
 function findUserPropertyAndUpdateByUserProperty(req, res, action, propertyName) {
   var username = req.params.username;
-  var propertyId = req.body._id;
-  var propertyValue = req.body;
+  var propertyId = req.params.id;
+  var propertyValue = req.body.data;
   return findUserByUsername(username).then(handleUserNotFound(res)).then(action(res, propertyName, propertyId, propertyValue)).catch(handleError(res));
 }
 
 function findUserAndCreateUserProperty(req, res, propertyName) {
   var username = req.params.username;
-  return findUserByUsername(username).then(handleUserNotFound(res)).then(createUserProperty(res, propertyName, req.body)).catch(handleError(res));
+  return findUserByUsername(username).then(handleUserNotFound(res)).then(createUserProperty(res, propertyName, req.body.data)).catch(handleError(res));
 }
 
 function saveEntity(res, entity, returnValue, code) {
@@ -334,7 +382,6 @@ function createUserProperty(res, propertyName, propertyValue) {
   return function (entity) {
     var property = entity[propertyName];
     property.push(propertyValue);
-    console.log(propertyValue);
     return saveEntity(res, entity, property[property.length - 1]);
   };
 }
@@ -414,18 +461,28 @@ function createHobby(req, res, next) {
   return findUserAndCreateUserProperty(req, res, hobbyProperty);
 }
 
+// positions
+function deletePosition(req, res, next) {
+  return findUserPropertyAndUpdateByUserProperty(req, res, deleteUserProperty, positionProperty);
+}
+
+function createPosition(req, res, next) {
+  return findUserAndCreateUserProperty(req, res, positionProperty);
+}
+
 //Simple field
 function updateSimpleField(res, propertyName, propertyValue) {
   return function (entity) {
     entity[propertyName] = propertyValue;
-    return saveEntity(res, entity, { 'value': entity[propertyName] });
+    return saveEntity(res, entity, {
+      'data': entity[propertyName]
+    });
   };
 }
 
 function findUserAndUpdateProperty(req, res, action, propertyName) {
   var username = req.params.username;
-  var propertyValue = req.body.value;
-  console.log('Property Value - ' + propertyValue);
+  var propertyValue = req.body.data;
   return findUserByUsername(username).then(handleUserNotFound(res)).then(action(res, propertyName, propertyValue)).catch(handleError(res));
 }
 
@@ -461,8 +518,70 @@ function authCallback(req, res, next) {
 }
 
 /**
-* Sort an array of results
-*/
+ * Export DOCX Resume
+ */
+
+function exportDOCX(req, res) {
+  findUserByUsername(req.params.username).then(function (user) {
+    if (!user) {
+      return res.status(404).end();
+    }
+
+    var buffer = generateDOCX(user);
+
+    res.setHeader('Content-disposition', 'attachment; filename=resume-' + user.username + '.docx');
+
+    return res.status(200).send(buffer).end();
+  }).catch(function (err) {
+    console.error('Error generating user report: ' + err);
+    return res.status(400).end();
+  });
+}
+
+function generateDOCX(user) {
+  var template = _fs2.default.readFileSync(TEMPLATE_PATH);
+  var zip = new _jszip2.default(template);
+  var docx = new _docxtemplater2.default().loadZip(zip);
+
+  docx.setData(_exportUserProfile2.default.generateResumeData(user));
+  docx.render();
+
+  return docx.getZip().generate({ type: 'nodebuffer' });
+}
+
+function exportPDF(req, res) {
+  findUserByUsername(req.params.username).then(handleUserNotFound(res)).then(renderHTMLToPDF(res));
+}
+
+function renderHTMLToPDF(res) {
+  return function (user) {
+    var resumeData = _exportUserProfile2.default.generateResumeData(user);
+    console.log(resumeData);
+    res.locals = resumeData;
+    res.render("resume/resume", generatePDF(res));
+  };
+}
+
+function generatePDF(res) {
+  return function (err, html) {
+    if (err) {
+      console.error('Error generating user report: ' + err);
+    } else {
+      var pdf = true; //debugging purpose
+      if (pdf) {
+        // Set content type of response
+        res.setHeader('Content-Type', 'application/pdf');
+        return (0, _wkhtmltopdf2.default)(html).pipe(res);
+      } else {
+        return res.send(html);
+      }
+    }
+  };
+}
+
+/**
+ * Sort an array of results
+ */
 
 function sortResults(arr, field, asc) {
   arr = arr.sort(function (el1, el2) {

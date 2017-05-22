@@ -17,6 +17,7 @@ module.exports = {
         timestamps: false
       }
     }
-  }
+  },
+  ssoUrl: 'http://sso.avenuecode.io/api/ac-superstars-local/loginByToken'
 };
 //# sourceMappingURL=../../config/environment/test.js.map

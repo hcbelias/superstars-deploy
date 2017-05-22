@@ -24,6 +24,10 @@ _mongoose2.default.Promise = require('bluebird');
 var authTypes = ['github', 'twitter', 'facebook', 'google'];
 
 var experienceSchema = new _mongoose.Schema({
+  isAvenueCode: {
+    type: Boolean,
+    default: false
+  },
   position: {
     type: String,
     required: true
@@ -48,8 +52,15 @@ var experienceSchema = new _mongoose.Schema({
 });
 
 var skillSchema = new _mongoose.Schema({
-  name: { type: String, required: 'Skill Name is a required field.', trim: true },
-  experienceYears: { type: Number, default: 0 }
+  name: {
+    type: String,
+    required: 'Skill Name is a required field.',
+    trim: true
+  },
+  experienceYears: {
+    type: Number,
+    default: 0
+  }
 });
 
 var educationSchema = new _mongoose.Schema({
@@ -91,7 +102,10 @@ var languageSchema = new _mongoose.Schema({
     type: String,
     required: 'Language is a required field.'
   },
-  level: { type: Number, default: 1 }
+  level: {
+    type: Number,
+    default: 1
+  }
 });
 
 var hobbySchema = new _mongoose.Schema({
@@ -100,7 +114,12 @@ var hobbySchema = new _mongoose.Schema({
     required: 'Hobby name is a required field.'
   }
 });
-
+var positionSchema = new _mongoose.Schema({
+  name: {
+    type: String,
+    required: 'Positiona name is a required field.'
+  }
+});
 var UserSchema = new _mongoose.Schema({
   name: {
     type: String,
@@ -116,14 +135,6 @@ var UserSchema = new _mongoose.Schema({
     type: String,
     lowercase: true,
     required: true
-  },
-  city: {
-    type: String,
-    trim: true
-  },
-  currentPosition: {
-    type: String,
-    trim: true
   },
   currentLocation: {
     type: String,
@@ -165,10 +176,6 @@ var UserSchema = new _mongoose.Schema({
   currentProject: {
     type: String
   },
-  profileComplete: {
-    type: Boolean,
-    default: false
-  },
   aboutMe: {
     type: String,
     default: ''
@@ -177,6 +184,7 @@ var UserSchema = new _mongoose.Schema({
     type: String,
     default: ''
   },
+  positions: [positionSchema],
   hobbies: [hobbySchema],
   experiences: [experienceSchema],
   skillsCloud: [skillSchema],
@@ -199,13 +207,12 @@ UserSchema.virtual('profile').get(function () {
     'name': this.name,
     'role': this.role,
     'email': this.email,
-    'position': this.currentPosition,
+    'positions': this.positions,
     'location': this.currentLocation,
     'social': this.social,
     'picture': this.getProfilePicture(),
-    'isProfileComplete': this.profileComplete,
-    'username': this.username
-
+    'username': this.username,
+    'isProfileComplete': this.profileComplete
   };
 });
 
@@ -215,7 +222,7 @@ UserSchema.virtual('completeProfile').get(function () {
     'role': this.role,
     'email': this.email,
     'username': this.username,
-    'position': this.currentPosition,
+    'positions': this.positions,
     'location': this.currentLocation,
     'social': this.social,
     'picture': this.getProfilePicture(),
@@ -246,6 +253,10 @@ UserSchema.virtual('token').get(function () {
     '_id': this._id,
     'role': this.role
   };
+});
+
+UserSchema.virtual('profileComplete').get(function () {
+  return null !== this.aboutMe && '' !== this.aboutMe.trim() && null !== this.social.skype && '' !== this.social.skype.trim() && null !== this.summaryOfQualification && '' !== this.summaryOfQualification.trim() && null !== this.positions && this.positions.length > 0;
 });
 
 /**

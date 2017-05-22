@@ -8,6 +8,7 @@ exports.hasRole = hasRole;
 exports.signToken = signToken;
 exports.setTokenCookie = setTokenCookie;
 exports.hasPermissionToEdit = hasPermissionToEdit;
+exports.hasPermissionToAddEntity = hasPermissionToAddEntity;
 
 var _passport = require('passport');
 
@@ -89,7 +90,10 @@ function hasRole(roleRequired) {
  * Returns a jwt token signed by the app secret
  */
 function signToken(id, role) {
-  return _jsonwebtoken2.default.sign({ _id: id, role: role }, _environment2.default.secrets.session, {
+  return _jsonwebtoken2.default.sign({
+    _id: id,
+    role: role
+  }, _environment2.default.secrets.session, {
     expiresIn: 60 * 60 * 5
   });
 }
@@ -101,8 +105,12 @@ function setTokenCookie(req, res) {
   if (!req.user) {
     return res.status(404).send('It looks like you aren\'t logged in, please try again.');
   }
-  var token = signToken(req.user._id, req.user.role);
-  res.cookie('token', token);
+
+  if (req.authInfo && req.authInfo.ssoToken && req.authInfo.ssoToken.token) {
+    res.cookie('ssotoken', req.authInfo.ssoToken.token);
+  }
+
+  res.cookie('token', signToken(req.user._id, req.user.role));
   res.redirect('/');
 }
 
@@ -113,7 +121,19 @@ function hasPermissionToEdit(req, res) {
       next();
     } else {
       res.status(403).send({
-        message: 'This user does not have permission to edit other profiles.'
+        message: 'This user does not have permission to edit.'
+      });
+    }
+  });
+}
+
+function hasPermissionToAddEntity(req, res) {
+  return (0, _composableMiddleware2.default)().use(isAuthenticated()).use(function hasPermission(req, res, next) {
+    if (req.user.role === 'admin') {
+      next();
+    } else {
+      res.status(403).send({
+        message: 'This user does not have permission to edit.'
       });
     }
   });
