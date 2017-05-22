@@ -1,7 +1,6 @@
 'use strict';
 
 angular.module('superstarsApp', ['superstarsApp.auth', 'superstarsApp.constants', 'superstarsApp.screen', 'ngCookies', 'ngResource', 'ngSanitize', 'btford.socket-io', 'ui.router', 'validation.match', 'ngMaterial', 'ngMessages', 'pascalprecht.translate', 'zInfiniteScroll', 'duScroll']).config(function ($urlRouterProvider, $locationProvider, $translateProvider, $mdThemingProvider, appConfig) {
-<<<<<<< HEAD
     $urlRouterProvider.otherwise('/');
     $urlRouterProvider.rule(function ($injector, $location) {
 
@@ -15,35 +14,14 @@ angular.module('superstarsApp', ['superstarsApp.auth', 'superstarsApp.constants'
             return newPath;
         }
     });
-=======
-  $urlRouterProvider.otherwise('/');
-  $urlRouterProvider.rule(function ($injector, $location) {
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
 
-    var path = $location.path();
-    var hasTrailingSlash = path[path.length - 1] === '/';
+    $locationProvider.html5Mode(true);
 
-<<<<<<< HEAD
     $translateProvider.useSanitizeValueStrategy('sanitize');
     $translateProvider.translations('en', appConfig.I18N.en);
     $translateProvider.preferredLanguage('en');
-=======
-    if (hasTrailingSlash) {
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
 
-      //if last charcter is a slash, return the same url without the slash  
-      var newPath = path.substr(0, path.length - 1);
-      return newPath;
-    }
-  });
-
-  $locationProvider.html5Mode(true);
-
-  $translateProvider.useSanitizeValueStrategy('sanitize');
-  $translateProvider.translations('en', appConfig.I18N.en);
-  $translateProvider.preferredLanguage('en');
-
-  $mdThemingProvider.theme('default').primaryPalette('blue').warnPalette('orange');
+    $mdThemingProvider.theme('default').primaryPalette('blue').warnPalette('orange');
 });
 //# sourceMappingURL=../app/app.js.map
 'use strict';
@@ -418,7 +396,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.buildToastMessage(SUCCESS_MESSAGE, this.Toast.show, this.Toast.simple);
         }
         this.state.go('main');
-<<<<<<< HEAD
       }
     }, {
       key: 'showMessage',
@@ -456,45 +433,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.User.deleteProfile({ username: this.user.username, path: path, id: id }, this.showSuccessMessage(), this.showErrorMessage());
       }
     }, {
-=======
-      }
-    }, {
-      key: 'showMessage',
-      value: function showMessage(message) {
-        var toast = this.Toast.show;
-        var toastBuilder = this.Toast.simple;
-        var buildToastFunc = this.buildToastMessage;
-        return function () {
-          return buildToastFunc(message, toast, toastBuilder);
-        };
-      }
-    }, {
-      key: 'buildToastMessage',
-      value: function buildToastMessage(message, toast, toastBuilder) {
-        toast(toastBuilder().textContent(message).position('bottom right'));
-      }
-    }, {
-      key: 'updateSimpleField',
-      value: function updateSimpleField(path, value) {
-        this.User.updateProfile({ username: this.user.username, path: path, data: value }, this.showSuccessMessage(), this.showErrorMessage());
-      }
-    }, {
-      key: 'updateComplexField',
-      value: function updateComplexField(path, object) {
-        this.User.updateProfile({ username: this.user.username, path: path, data: object, id: object._id }, this.showSuccessMessage(), this.showErrorMessage());
-      }
-    }, {
-      key: 'save',
-      value: function save(path, object, field) {
-        this.User.saveProfile({ username: this.user.username, path: path, data: object }, this.updateNewPropertyId(field), this.showErrorMessage());
-      }
-    }, {
-      key: 'delete',
-      value: function _delete(path, id) {
-        this.User.deleteProfile({ username: this.user.username, path: path, id: id }, this.showSuccessMessage(), this.showErrorMessage());
-      }
-    }, {
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
       key: 'deleteProfile',
       value: function deleteProfile() {
         if (this.Auth.isAdmin()) {
@@ -1071,29 +1009,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   var ProfileAdminBarController = function () {
     function ProfileAdminBarController(ProfileService) {
       _classCallCheck(this, ProfileAdminBarController);
-<<<<<<< HEAD
-
-      this.path = 'onbench';
-      this.ProfileService = ProfileService;
-    }
-
-    _createClass(ProfileAdminBarController, [{
-      key: 'update',
-      value: function update() {
-        this.onUpdate({
-          path: this.path,
-          value: this.user.onBench
-        });
-      }
-    }, {
-      key: 'delete',
-      value: function _delete() {
-        var that = this;
-        this.ProfileService.confirm(event, 'profile', function () {
-          that.deleteProfile();
-        });
-      }
-=======
 
       this.path = 'onbench';
       this.ProfileService = ProfileService;
@@ -1153,215 +1068,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: '$onChanges',
       value: function $onChanges(changes) {
         var certification = changes.certification ? changes.certification.currentValue : null;
-
-        if (certification) {
-          this.resetModel(certification);
-        }
-      }
-    }, {
-      key: 'toggle',
-      value: function toggle() {
-        this.certificationExpires = !this.certificationExpires;
-        if (!this.certificationExpires) {
-          this.model.endDate = null;
-        }
-      }
-    }, {
-      key: 'edit',
-      value: function edit() {
-        if (!this.readOnly) {
-          this.onEdit();
-        }
-      }
-    }, {
-      key: 'update',
-      value: function update($form) {
-        if ($form.$valid) {
-          angular.copy(this.model, this.certification);
-          this.onUpdate({
-            certification: this.certification
-          });
-        }
-      }
-    }, {
-      key: 'cancel',
-      value: function cancel(form) {
-        if (form) {
-          form.$setPristine();
-        }
-
-        this.resetModel();
-        this.onCancel();
-      }
-    }, {
-      key: 'resetModel',
-      value: function resetModel(certification) {
-        this.model = angular.copy(certification || this.certification);
-        this.certificationExpires = !!this.model.endDate;
-      }
-    }]);
-
-    return ProfileCertificationController;
-  }();
-
-  angular.module('superstarsApp').component('profileCertification', {
-    templateUrl: 'components/profile/certification/certification.html',
-    controller: ProfileCertificationController,
-    bindings: {
-      certification: '<',
-      editing: '<',
-      onCancel: '&',
-      onEdit: '&',
-      onUpdate: '&',
-      readOnly: '<'
-    }
-  });
-})();
-//# sourceMappingURL=../../../components/profile/certification/certification.component.js.map
-/* exported ProfileTimelineBaseController */
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-(function () {
-  var ProfileCertificationsController = function (_ProfileTimelineBaseC) {
-    _inherits(ProfileCertificationsController, _ProfileTimelineBaseC);
-
-    function ProfileCertificationsController(ProfileTileLocker, $filter, ProfileService, $window, Screen) {
-      _classCallCheck(this, ProfileCertificationsController);
-
-      var _this = _possibleConstructorReturn(this, (ProfileCertificationsController.__proto__ || Object.getPrototypeOf(ProfileCertificationsController)).call(this, '_id', 'startDate', 'profile::tile::certifications', ProfileTileLocker, $filter, Screen));
-
-      _this.ProfileService = ProfileService;
-      _this.modelField = 'certifications';
-      _this.path = 'certification';
-      _this.limitMobile = 3;
-      return _this;
-    }
-
-    _createClass(ProfileCertificationsController, [{
-      key: 'updateItem',
-      value: function updateItem(certification) {
-        var data = {
-          path: this.path,
-          object: certification,
-          field: this.modelField
-        };
-        _get(ProfileCertificationsController.prototype.__proto__ || Object.getPrototypeOf(ProfileCertificationsController.prototype), 'updateItem', this).call(this, certification);
-        angular.isUndefined(certification._id) ? this.onSave(data) : this.onUpdate(data);
-      }
-    }, {
-      key: 'removeItem',
-      value: function removeItem(item) {
-        if (item._id) {
-          var that = this;
-          this.ProfileService.confirm(event, 'certification', function () {
-            that.items.splice(that.items.indexOf(item), 1);
-            that.setItemInEditMode(null);
-            that.onDelete({
-              path: that.path,
-              id: item._id
-            });
-          });
-        } else {
-          _get(ProfileCertificationsController.prototype.__proto__ || Object.getPrototypeOf(ProfileCertificationsController.prototype), 'cancelItem', this).call(this, item);
-        }
-      }
-    }, {
-      key: 'help',
-      value: function help() {
-        this.ProfileService.help('Certifications', 'Add all of your certifications.');
-      }
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
-    }]);
-
-    return ProfileAdminBarController;
-  }();
-
-  angular.module('superstarsApp').component('profileAdminBar', {
-    transclude: true,
-    templateUrl: 'components/profile/adminBar/adminBar.html',
-    controller: ProfileAdminBarController,
-    bindings: {
-      user: '<',
-      onUpdate: '&',
-<<<<<<< HEAD
-      deleteProfile: '&',
-=======
-      onDelete: '&',
-      onSave: '&',
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
-      readOnly: '<'
-    }
-  });
-})();
-//# sourceMappingURL=../../../components/profile/adminBar/adminBar.component.js.map
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-(function () {
-<<<<<<< HEAD
-  var ProfileCertificationController = function () {
-    function ProfileCertificationController() {
-      _classCallCheck(this, ProfileCertificationController);
-
-      this.model = null;
-      this.certificationExpires = false;
-      this.currentDate = new Date();
-    }
-
-    _createClass(ProfileCertificationController, [{
-      key: '$onChanges',
-      value: function $onChanges(changes) {
-        var certification = changes.certification ? changes.certification.currentValue : null;
-=======
-  var ProfileContactController = function (_ProfileTimelineBaseC) {
-    _inherits(ProfileContactController, _ProfileTimelineBaseC);
-
-    function ProfileContactController(ProfileTileLocker, $filter, ProfileService, Screen) {
-      _classCallCheck(this, ProfileContactController);
-
-      var _this = _possibleConstructorReturn(this, (ProfileContactController.__proto__ || Object.getPrototypeOf(ProfileContactController)).call(this, '_id', 'startDate', 'profile::tile::contacts', ProfileTileLocker, $filter, Screen));
-
-      _this.ProfileService = ProfileService;
-      _this.profileTileLockerId = 'profile::tile::contacts';
-      return _this;
-    }
-
-    _createClass(ProfileContactController, [{
-      key: 'help',
-      value: function help() {
-        this.ProfileService.help('Contacts', 'Add your personal contact information here.');
-      }
-    }, {
-      key: 'update',
-      value: function update(path) {
-        var value = this.user.social[path];
-        this.onUpdate({
-          path: path,
-          value: value
-        });
-      }
-    }]);
-
-    return ProfileContactController;
-  }(ProfileTimelineBaseController);
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
 
         if (certification) {
           this.resetModel(certification);
@@ -1915,181 +1621,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       value: function help() {
         this.ProfileService.help('Languages', 'Add the languages you know and your proficiency.');
       }
-    }, {
-      key: 'save',
-      value: function save() {
-        this.onSave({
-          path: this.path,
-          object: this.user.hobbies[this.user.hobbies.length - 1],
-          field: this.modelField
-        });
-      }
-    }, {
-      key: 'remove',
-      value: function remove(item) {
-        this.onDelete({
-          path: this.path,
-          id: item._id
-        });
-      }
-    }, {
-      key: 'newHobby',
-      value: function newHobby(hobby) {
-        return {
-          name: hobby
-        };
-      }
-    }]);
-
-<<<<<<< HEAD
-    return ProfileHobbiesController;
-=======
-    return ProfileLanguagesController;
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
-  }(ProfileTimelineBaseController);
-
-  angular.module('superstarsApp').component('profileLanguages', {
-    transclude: true,
-    templateUrl: 'components/profile/languages/languages.html',
-    controller: ProfileLanguagesController,
-    bindings: {
-      user: '<',
-<<<<<<< HEAD
-=======
-      onUpdate: '&',
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
-      onSave: '&',
-      onDelete: '&',
-      readOnly: '<'
-    }
-  });
-})();
-<<<<<<< HEAD
-//# sourceMappingURL=../../../components/profile/hobbies/hobbies.component.js.map
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-(function () {
-  var ProfileLanguagesController = function (_ProfileTimelineBaseC) {
-    _inherits(ProfileLanguagesController, _ProfileTimelineBaseC);
-
-    function ProfileLanguagesController(ProfileTileLocker, $filter, ProfileService, Screen) {
-      _classCallCheck(this, ProfileLanguagesController);
-
-      var _this = _possibleConstructorReturn(this, (ProfileLanguagesController.__proto__ || Object.getPrototypeOf(ProfileLanguagesController)).call(this, '_id', 'startDate', 'profile::tile::languages', ProfileTileLocker, $filter, Screen));
-
-      _this.ProfileService = ProfileService;
-      _this.orderBy = $filter('orderBy');
-      _this.starIsHovered = [];
-      _this.profileTileLockerId = 'profile::tile::languages';
-      _this.path = 'language';
-      _this.modelField = 'languageSkills';
-      _this.limitMobile = 5;
-      _this.limitTo = null;
-      _this.enableShowMoreButton();
-      return _this;
-    }
-
-    _createClass(ProfileLanguagesController, [{
-      key: '$onChanges',
-      value: function $onChanges(changesObj) {
-        if (changesObj.user && changesObj.user.currentValue) {
-          changesObj.user.currentValue.languageSkills = this.orderBy(changesObj.user.currentValue.languageSkills, 'level', true);
-          this.starIsHovered = new Array(changesObj.user.currentValue.languageSkills.length).fill(0);
-        }
-      }
-    }, {
-      key: 'doUpdate',
-      value: function doUpdate(language) {
-        if (language.name !== undefined && language.name !== '' && language.level > 0) {
-          this.update(language);
-        }
-      }
-    }, {
-      key: 'addItem',
-      value: function addItem() {
-        this.user.languageSkills.unshift({
-          name: '',
-          level: 1
-        });
-        this.disabledShowMoreButton = true;
-      }
-    }, {
-      key: 'removeItem',
-      value: function removeItem(language) {
-        if (language._id) {
-          var that = this;
-          this.ProfileService.confirm(event, 'language', function () {
-            that.user.languageSkills.splice(that.user.languageSkills.indexOf(language), 1);
-            that.onDelete({
-              path: that.path,
-              id: language._id
-            });
-          });
-        } else {
-          var index = this.user.languageSkills.indexOf(language);
-          this.user.languageSkills.splice(index, 1);
-          this.enableShowMoreButton();
-        }
-      }
-    }, {
-      key: 'update',
-      value: function update(language) {
-        var data = {
-          path: this.path,
-          object: language,
-          field: this.modelField
-        };
-        angular.isUndefined(language._id) ? this.onSave(data) : this.onUpdate(data);
-        this.enableShowMoreButton();
-      }
-    }, {
-      key: 'enableShowMoreButton',
-      value: function enableShowMoreButton() {
-        this.disabledShowMoreButton = false;
-      }
-    }, {
-      key: 'setLevel',
-      value: function setLevel(language, level) {
-        if (!this.readOnly) {
-          this.user.languageSkills[this.user.languageSkills.indexOf(language)].level = level;
-          this.doUpdate(language);
-        }
-      }
-    }, {
-      key: 'getLevelClass',
-      value: function getLevelClass(language, level) {
-        var classname = ['empty'];
-        level <= language.level && classname.push('selected');
-        level <= this.starIsHovered[this.user.languageSkills.indexOf(language)] && classname.push('levelhover');
-        return classname.join(' ');
-      }
-    }, {
-      key: 'setHover',
-      value: function setHover(language, level) {
-        if (!this.readOnly) {
-          this.starIsHovered[this.user.languageSkills.indexOf(language)] = level;
-        }
-      }
-    }, {
-      key: 'unsetHover',
-      value: function unsetHover(language) {
-        if (!this.readOnly) {
-          this.starIsHovered[this.user.languageSkills.indexOf(language)] = 0;
-        }
-      }
-    }, {
-      key: 'help',
-      value: function help() {
-        this.ProfileService.help('Languages', 'Add the languages you know and your proficiency.');
-      }
     }]);
 
     return ProfileLanguagesController;
@@ -2108,8 +1639,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }
   });
 })();
-=======
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
 //# sourceMappingURL=../../../components/profile/languages/languages.component.js.map
 'use strict';
 
@@ -2337,8 +1866,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           skill.experienceYears = 0;
         }
         if (angular.isUndefined(skill.name) || skill.name === '') {
-<<<<<<< HEAD
-=======
           return;
         }
         angular.isUndefined(skill._id) ? this.onSave(data) : this.onUpdate(data);
@@ -2395,145 +1922,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       onUpdate: '&',
       onSave: '&',
       onDelete: '&',
-      readOnly: '<'
-    }
-  });
-})();
-//# sourceMappingURL=../../../components/profile/skills/skills.component.js.map
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-(function () {
-  var ProfileTileController = function () {
-    function ProfileTileController(ProfileTileLocker, Screen) {
-      _classCallCheck(this, ProfileTileController);
-
-      this.ProfileTileLocker = ProfileTileLocker;
-      this.addButtonEnabled = angular.isDefined(this.addButtonEnabled) ? this.addButtonEnabled : true;
-      this.initTileLockListener();
-      this.SHOW_MORE_BUTTON = {
-        SHOW_MORE: 'Show More',
-        SHOW_LESS: 'Show Less'
-      };
-      this.showMoreText = this.SHOW_MORE_BUTTON.SHOW_MORE;
-      this.Screen = Screen;
-    }
-
-    _createClass(ProfileTileController, [{
-      key: '$onInit',
-      value: function $onInit() {
-        if (this.Screen.isExtraSmallScreen()) {
-          this.limitItemsMobile = this.maxItemsMobile;
-        }
-      }
-    }, {
-      key: 'initTileLockListener',
-      value: function initTileLockListener() {
-        var _this = this;
-
-        if (!this.profileTileLockerId) {
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
-          return;
-        }
-        angular.isUndefined(skill._id) ? this.onSave(data) : this.onUpdate(data);
-        this.disabledShowMoreButton = false;
-      }
-    }, {
-<<<<<<< HEAD
-      key: 'removeItem',
-      value: function removeItem(skill) {
-        if (skill && skill._id) {
-          var that = this;
-          this.ProfileService.confirm(event, 'skill', function () {
-            that.user.skillsCloud.splice(that.user.skillsCloud.indexOf(skill), 1);
-            that.onDelete({
-              path: that.path,
-              id: skill._id
-            });
-            that.disabledShowMoreButton = false;
-          });
-        } else {
-          this.showAutocomplete = false;
-=======
-      key: 'changeShowMoreButtonText',
-      value: function changeShowMoreButtonText() {
-        this.showMoreText = this.showMoreText === this.SHOW_MORE_BUTTON.SHOW_MORE ? this.SHOW_MORE_BUTTON.SHOW_LESS : this.SHOW_MORE_BUTTON.SHOW_MORE;
-      }
-    }, {
-      key: '$onDestroy',
-      value: function $onDestroy() {
-        if (this.tileLocker) {
-          this.tileLocker.unsubscribe();
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
-        }
-        this.disabledShowMoreButton = false;
-      }
-    }, {
-      key: 'help',
-      value: function help() {
-        this.ProfileService.help('Skills', 'Add your professional skills.');
-      }
-    }, {
-      key: 'querySearch',
-      value: function querySearch(query) {
-        var results = query ? this.items.filter(this.createFilterFor(query)) : this.items;
-        return results;
-      }
-    }, {
-      key: 'createFilterFor',
-      value: function createFilterFor(query) {
-        var lowercaseQuery = angular.lowercase(query);
-
-        return function filterFn(skill) {
-          return angular.lowercase(skill.name).indexOf(lowercaseQuery) === 0;
-        };
-      }
-    }, {
-      key: 'showShowMoreButton',
-      value: function showShowMoreButton() {
-        if (this.Screen.isExtraSmallScreen()) {
-          return parseInt(this.itemsLength) > parseInt(this.maxItemsMobile);
-        }
-        return false;
-      }
-    }, {
-      key: 'onShowMore',
-      value: function onShowMore() {
-        this.showMoreClick = !this.showMoreClick;
-        this.limitItemsMobile = this.showMoreClick ? null : this.maxItemsMobile;
-      }
-    }]);
-
-    return ProfileSkillsController;
-  }(ProfileTimelineBaseController);
-
-  angular.module('superstarsApp').component('profileSkills', {
-    templateUrl: 'components/profile/skills/skills.html',
-    controller: ProfileSkillsController,
-    bindings: {
-<<<<<<< HEAD
-      user: '<',
-      onUpdate: '&',
-      onSave: '&',
-      onDelete: '&',
-=======
-      title: '@',
-      icon: '@',
-      addButtonFlex: '@',
-      showAddButton: '@',
-      addButtonEnabled: '<',
-      profileTileLockerId: '<',
-      onHelp: '&',
-      onAddItem: '&',
-      limitItemsMobile: '=',
-      maxItemsMobile: '<',
-      itemsLength: '<',
-      disabledShowMoreButton: '<',
-      locked: '<',
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
       readOnly: '<'
     }
   });
@@ -3644,17 +3032,12 @@ $templateCache.put("components/toolbar/listBottomMenu.html","<md-bottom-sheet id
 $templateCache.put("components/toolbar/toolbar.html","<md-toolbar ng-show=\"!toolbarCtrl.isLoggedIn()\" class=\"animate-show\"><div class=\"md-toolbar-tools\"><md-button ng-click=\"toolbarCtrl.toggleSidenav(\'left\')\" aria-label=\"Menu\" class=\"md-icon-button\"><i class=\"material-icons\">menu</i></md-button></div></md-toolbar><md-toolbar ng-show=\"toolbarCtrl.isLoggedIn()\" class=\"animate-show md-whiteframe-z1\"><div data-ng-show=\"toolbarCtrl.showMobileMainHeader\" class=\"md-toolbar-tools\"><md-button ng-click=\"toolbarCtrl.toggleSidenav(\'left\')\" aria-label=\"Menu\" class=\"md-icon-button\"><i class=\"material-icons\">menu</i></md-button><i hide-xs=\"hide-xs\" class=\"material-icons\">search</i><span flex=\"flex\" hide-xs=\"hide-xs\"><md-input-container md-no-float=\"\"><input id=\"sup-j-toolBar-searchField\" placeholder=\"Search for people\" ng-model=\"toolbarCtrl.searchText\" ng-model-options=\"{debounce:180}\" ng-change=\"toolbarCtrl.checkLenghtAndUpdate()\" type=\"text\"/></md-input-container></span><div hide-xs=\"hide-xs\" hide-sm=\"hide-sm\" ng-repeat=\"item in toolbarCtrl.items\" ng-show=\"toolbarCtrl.showMenuItem(item)\" class=\"button-container\"><md-button ng-if=\"!item.hasOptions\" aria-label=\"{{ buttom.name | translate }}\" target=\"{{item.target}}\" ui-sref=\"{{item.sref}}\" ng-click=\"item.sref\" id=\"sup-profile-{{ item.name.split(\' \').join(\'\') }}\" ui-sref-active=\"active\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"text-icon\">{{ item.name | translate }}</span></md-button><md-button ng-if=\"item.hasOptions\" aria-label=\"{{ buttom.name | translate }}\" ng-click=\"toolbarCtrl.openButtonMenu($index)\" id=\"sup-profile-{{ item.name.split(\' \').join(\'\') }}\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"text-icon\">{{ item.name | translate }}</span></md-button><div hide-on-click-window=\"hide-on-click-window\" rule=\"{{toolbarCtrl.items[$index].openMenu}}\" ng-if=\"item.hasOptions\" class=\"menu-content md-whiteframe-4dp\"><div ng-repeat=\"menu in toolbarCtrl.items[$index].menuOptions\" class=\"menu-itens\"><a href=\"#\" ui-sref=\"{{menu.link}}\" target=\"_blank\"><div layout=\"row\"><div ng-bind-html=\"menu.icon\"></div><div class=\"menu-label\">{{menu.label}}</div></div></a></div></div></div><span flex=\"\" hide-gt-xs=\"\">      </span><md-button aria-label=\"Search\" hide-gt-xs=\"\" data-ng-click=\"toolbarCtrl.setMobileMainHeader(false)\" class=\"md-icon-button\"><i class=\"material-icons\">search</i></md-button><md-button aria-label=\"More\" hide-gt-sm=\"hide-gt-sm\" ng-click=\"toolbarCtrl.showListBottomSheet()\" class=\"md-icon-button\"><i class=\"material-icons\">more_vert</i></md-button></div><div hide-gt-xs=\"hide-gt-xs\" data-ng-hide=\"toolbarCtrl.showMobileMainHeader\" class=\"md-toolbar-tools\"><md-button aria-label=\"Back\" data-ng-click=\"toolbarCtrl.setMobileMainHeader(true)\" class=\"md-icon-button\"><i class=\"material-icons\">arrow_back</i></md-button><div md-no-float=\"md-no-float\" style=\"padding-bottom:0px;\" class=\"custom-input-container md-accent\"><span flex=\"flex\"><md-input-container md-no-float=\"\"><input id=\"sup-j-toolBar-searchField\" placeholder=\"Search\" ng-model=\"toolbarCtrl.searchText\" ng-model-options=\"{debounce:180}\" ng-change=\"toolbarCtrl.checkLenghtAndUpdate()\" type=\"text\"/></md-input-container></span></div></div></md-toolbar>");
 $templateCache.put("components/userCard/userCard.html","<div id=\"sup-j-userCard\" ng-click=\"$ctrl.click()\" layout=\"column\" layout-align=\"none center\" class=\"container\"><img ng-src=\"{{$ctrl.user.picture}}\" alt=\"\" class=\"user-avatar\"/><div class=\"user-name\">{{$ctrl.user.name}}</div><div class=\"user-position\"><md-tooltip md-direction=\"bottom\">{{ $ctrl.positionsTooltip }}</md-tooltip><p ng-show=\"$ctrl.user.positions.length === 0\" class=\"position\">{{ $ctrl.positionsTooltip }}</p><p ng-show=\"$ctrl.user.positions.length === 1\" class=\"position\">{{ $ctrl.user.positions[0].name }}</p><p ng-show=\"$ctrl.user.positions.length &gt; 1\" class=\"position\">{{ $ctrl.user.positions[0].name }} and others</p></div><div class=\"user-email\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.email}}</md-tooltip><div class=\"user-email-text\">{{$ctrl.user.email}}</div></div><div layout=\"row\" layout-align=\"center center\" class=\"actions\"><div ng-show=\"$ctrl.user.social.facebook\" class=\"action facebook\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.facebook}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.facebook}}\" target=\"_blank\"><i class=\"fa fa-facebook-square\"></i></a></div><div ng-show=\"$ctrl.user.social.twitter\" class=\"action twitter\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.twitter}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.twitter}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-twitter\"></i></a></div><div ng-show=\"$ctrl.user.social.skype\" class=\"action skype\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.skype}}</md-tooltip><i aria-hidden=\"true\" class=\"fa fa-skype\"></i></div><div ng-show=\"$ctrl.user.social.linkedIn\" class=\"action linkedIn\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.linkedIn}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.linkedIn}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-linkedin\"></i></a></div></div></div>");
 $templateCache.put("components/userList/userList.html","<md-content layout=\"column\" flex=\"flex\" layout-align=\"center center\" ng-hide=\"!$ctrl.loaded || $ctrl.usersShown.length\" class=\"no-results ng-hide\"><div class=\"icon-sad\">:(</div><div class=\"message\">Sorry! No results for: \"{{$ctrl.query}}\"</div></md-content><md-content md-scroll-y=\"md-scroll-y\" layout=\"row\" layout-wrap=\"layout-wrap\" flex=\"flex\" z-infinite-scroll=\"$ctrl.eventHandler\" scroll-threshold=\"300\" time-threshold=\"0\" ng-show=\"$ctrl.usersShown.length\" id=\"user-cards-content\"><user-card ng-repeat=\"user in $ctrl.usersShown\" flex-xs=\"100\" flex-sm=\"50\" flex=\"25\" user=\"user\" on-click=\"$ctrl.click(user)\"></user-card><scroll-top-button parent-id=\"user-cards-content\" min-height=\"304\" miliseconds=\"1000\"></scroll-top-button></md-content>");
-<<<<<<< HEAD
 $templateCache.put("app/account/login/login.html","<div layout=\"column\" layout-align=\"center center\" flex=\"flex\" class=\"oauth-button-container\"><div layout=\"column\" layout-align=\"center center\" layout-wrap=\"layout-wrap\" flex=\"flex\"><img alt=\"Avenue Code Superstars\" src=\"assets/images/main_logo-c45f76e722.png\" class=\"img-responsive text-center\"/><p id=\"non-ac-account-login-msg\">You need to have an Avenue Code account to access this application.</p><p class=\"error\">{{ serverMessage }}</p><oauth-buttons classes=\"btn-block\"></oauth-buttons></div></div>");
-=======
-$templateCache.put("app/account/login/login.html","<div layout=\"column\" layout-align=\"center center\" flex=\"flex\" class=\"oauth-button-container\"><div layout=\"column\" layout-align=\"center center\" layout-wrap=\"layout-wrap\" flex=\"flex\"><img alt=\"Avenue Code Superstars\" src=\"assets/images/main_logo-1d29e635dd.png\" class=\"img-responsive text-center\"/><p id=\"non-ac-account-login-msg\">You need to have an Avenue Code account to access this application.</p><p class=\"error\">{{ serverMessage }}</p><oauth-buttons classes=\"btn-block\"></oauth-buttons></div></div>");
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
 $templateCache.put("components/profile/aboutMe/aboutMe.html","<profile-tile title=\"About me\" icon=\"person_outline\" on-help=\"$ctrl.help($event)\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><md-input-container class=\"md-block\"><textarea id=\"sup-j-profile-aboutMe\" ng-model=\"$ctrl.user.aboutMe\" ng-if=\"$ctrl.readOnly\" readonly=\"$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"About me\" class=\"about-me\"></textarea><textarea id=\"sup-j-profile-aboutMe\" ng-model=\"$ctrl.user.aboutMe\" ng-if=\"!$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"About me\" class=\"about-me\"></textarea></md-input-container></profile-tile>");
 $templateCache.put("components/profile/adminBar/adminBar.html","<div layout=\"row\" layout-align=\"space-between center\" layout-wrap=\"layout-wrap\" flex=\"flex\" class=\"admin-bar\"><div class=\"bench\"><md-switch md-no-ink=\"md-no-ink\" aria-label=\"Switch No Ink\" ng-model=\"$ctrl.user.onBench\" ng-change=\"$ctrl.update()\" class=\"md-primary\">User on bench</md-switch></div><div class=\"timestamp\">Last time edited: {{ $ctrl.user.updatedAt | date: \'MM/dd/yyyy - HH:mm\'}}</div><div class=\"delete\"><md-button ng-click=\"$ctrl.delete()\" class=\"md-raised\">Delete Profile</md-button></div></div>");
 $templateCache.put("components/profile/certification/certification.html","<div id=\"sup-j-profile-certification-{{ $ctrl.model.name.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"certification-name\">{{$ctrl.model.name}}</span></h1><div class=\"certification-dates\"><span>From:&nbsp;</span><span class=\"certification-start-date\">{{$ctrl.model.startDate | date: \'yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"certification-end-date\">{{$ctrl.model.endDate | date: \'yyyy\'}}</span></div><div class=\"certification-authority\">{{$ctrl.model.authority}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><label>Certification Name</label><input id=\"sup-j-certification-name\" ng-model=\"$ctrl.model.name\" autofocus=\"autofocus\" required=\"required\" name=\"certificationName\" class=\"certification-name\"/><div ng-messages=\"editForm.certificationName.$error\"><div ng-message=\"required\">Certification Name cannot be empty</div></div></md-input-container><md-input-container class=\"md-block\"><label>Certification Authority</label><input id=\"sup-j-certification-authority\" ng-model=\"$ctrl.model.authority\" required=\"required\" name=\"certificationAuthority\" class=\"certification-authority\"/><div ng-messages=\"editForm.certificationAuthority.$error\"><div ng-message=\"required\">Certification Authority cannot be empty	</div></div></md-input-container><div layout=\"row\"><md-input-container flex=\"50\"><label>Start Date</label><md-datepicker id=\"sup-j-certification-startDate\" ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" name=\"startDate\" required=\"required\" md-max-date=\"$ctrl.currentDate\" md-open-on-focus=\"md-open-on-focus\" class=\"certification-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><div ng-message=\"required\">Start Date cannot be empty</div><div ng-message=\"valid\">Start Date must be a valid date</div><div ng-message=\"maxdate\">Start Date must be less than today</div></div></md-input-container><md-input-container ng-show=\"$ctrl.certificationExpires\" class=\"flex\"><label>End Date</label><md-datepicker id=\"sup-j-certification-endDate\" ng-model=\"$ctrl.model.endDate\" ng-required=\"$ctrl.certificationExpires\" md-hide-icons=\"calendar\" name=\"endDate\" md-min-date=\"$ctrl.model.startDate\" md-open-on-focus=\"md-open-on-focus\" class=\"certification-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><div ng-message=\"required\">End Date cannot be empty</div><div ng-message=\"valid\">End Date must be a valid date</div><div ng-message=\"mindate\">End Date should be greater than Start Date</div></div></md-input-container></div><md-checkbox id=\"sup-j-certification-checkBox\" ng-checked=\"$ctrl.certificationExpires\" ng-click=\"$ctrl.toggle()\" class=\"certification-expires\">This certification expires.</md-checkbox><md-button id=\"sup-j-certification-save\" type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button id=\"sup-j-certification-cancel\" ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
 $templateCache.put("components/profile/certifications/certifications.html","<profile-timeline-tile title=\"Certification\" icon=\"book\" on-help=\"$ctrl.help($event)\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" add-button-enabled=\"!$ctrl.isInEditMode()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.items.length\" max-items-mobile=\"$ctrl.limitMobile\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><profile-timeline-item ng-repeat=\"certification in $ctrl.items | limitTo: $ctrl.limitTo\" blocked=\"$ctrl.isBlocked(certification)\" fixed-remove-icon=\"$ctrl.isEditing(certification)\" on-remove=\"$ctrl.removeItem(certification)\" read-only=\"$ctrl.readOnly\" year=\"{{certification.startDate | date:\'yyyy\'}}\"><profile-certification certification=\"certification\" editing=\"$ctrl.isEditing(certification)\" on-cancel=\"$ctrl.cancelItem(certification)\" on-edit=\"$ctrl.editItem(certification)\" on-update=\"$ctrl.updateItem(certification)\" read-only=\"$ctrl.readOnly\"></profile-certification></profile-timeline-item></profile-timeline-tile>");
 $templateCache.put("components/profile/contacts/contacts.html","<profile-tile title=\"Contact\" icon=\"smartphone\" on-help=\"$ctrl.help($event)\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-linkedin\" class=\"fa\"></md-icon><input ng-if=\"$ctrl.readOnly\" readonly=\"$ctrl.readOnly\" ng-change=\"$ctrl.update(\'linkedIn\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"linkedin\" id=\"sup-j-profile-contact-in\" ng-model=\"$ctrl.user.social.linkedIn\" aria-label=\"LinkedIn\"/><input ng-if=\"!$ctrl.readOnly\" ng-change=\"$ctrl.update(\'linkedIn\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"linkedin\" id=\"sup-j-profile-contact-in\" ng-model=\"$ctrl.user.social.linkedIn\" aria-label=\"LinkedIn\"/></md-input-container></div><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-facebook\" class=\"fa\"></md-icon><input ng-if=\"$ctrl.readOnly\" readonly=\"$ctrl.readOnly\" ng-change=\"$ctrl.update(\'facebook\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"facebook\" id=\"sup-j-profile-contact-fb\" ng-model=\"$ctrl.user.social.facebook\" aria-label=\"Facebook\"/><input ng-if=\"!$ctrl.readOnly\" ng-change=\"$ctrl.update(\'facebook\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"facebook\" id=\"sup-j-profile-contact-fb\" ng-model=\"$ctrl.user.social.facebook\" aria-label=\"Facebook\"/></md-input-container></div><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-twitter\" class=\"fa\"></md-icon><input ng-if=\"$ctrl.readOnly\" readonly=\"$ctrl.readOnly\" ng-change=\"$ctrl.update(\'twitter\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"twitter\" id=\"sup-j-profile-contact-tw\" ng-model=\"$ctrl.user.social.twitter\" aria-label=\"Twitter\"/><input ng-if=\"!$ctrl.readOnly\" ng-change=\"$ctrl.update(\'twitter\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"twitter\" id=\"sup-j-profile-contact-tw\" ng-model=\"$ctrl.user.social.twitter\" aria-label=\"Twitter\"/></md-input-container></div><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-skype\" class=\"fa\"></md-icon><input ng-if=\"$ctrl.readOnly\" readonly=\"$ctrl.readOnly\" ng-change=\"$ctrl.update(\'skype\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"skype\" id=\"sup-j-profile-contact-sk\" ng-model=\"$ctrl.user.social.skype\" aria-label=\"Skype\"/><input ng-if=\"!$ctrl.readOnly\" ng-change=\"$ctrl.update(\'skype\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"skype\" id=\"sup-j-profile-contact-sk\" ng-model=\"$ctrl.user.social.skype\" aria-label=\"Skype\"/></md-input-container></div><div class=\"profile-contact\"><md-input-container class=\"md-icon-float md-block\"><md-icon md-font-icon=\"fa-envelope\" class=\"fa\"></md-icon><input ng-if=\"$ctrl.readOnly\" readonly=\"true\" ng-change=\"$ctrl.update(\'undefined\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"email\" id=\"sup-j-profile-contact-email\" ng-model=\"$ctrl.user.email\" aria-label=\"Email\"/><input ng-if=\"!$ctrl.readOnly\" ng-change=\"$ctrl.update(\'undefined\')\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 1500, \'blur\': 0}}\" class=\"email\" id=\"sup-j-profile-contact-email\" ng-model=\"$ctrl.user.email\" aria-label=\"Email\" readonly=\"true\"/></md-input-container></div></profile-tile>");
-<<<<<<< HEAD
 $templateCache.put("components/profile/education/education.html","<div id=\"sup-j-profile-education-{{ $ctrl.model.field.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"education-degree\">{{$ctrl.model.degree}}</span> degree in <span class=\"education-field\">{{$ctrl.model.field}}</span> at <span class=\"education-name\">{{$ctrl.model.school}}</span></h1><div class=\"education-dates\"><span>From:&nbsp;</span><span class=\"education-start-date\">{{$ctrl.model.startDate | date: \'yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"education-end-date\">{{$ctrl.model.endDate | date: \'yyyy\'}}</span></div><div class=\"education-activities\">{{$ctrl.model.activities}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><label>School Name</label><input id=\"sup-j-education-schoolName\" ng-model=\"$ctrl.model.school\" name=\"school\" autofocus=\"autofocus\" required=\"required\" class=\"education-school\"/><div ng-messages=\"editForm.school.$error\"><p ng-message=\"required\">School name is required</p></div></md-input-container><md-input-container class=\"md-block\"><label>Field</label><input id=\"sup-j-education-field\" ng-model=\"$ctrl.model.field\" name=\"field\" required=\"required\" class=\"education-field\"/><div ng-messages=\"editForm.field.$error\"><p ng-message=\"required\">Your field is required</p></div></md-input-container><div layout=\"row\"><md-input-container class=\"flex\"><label>From</label><md-datepicker id=\"sup-j-education-startDate\" ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" ng-required=\"true\" name=\"startDate\" type=\"date\" md-max-date=\"$ctrl.currentDate\" md-open-on-focus=\"md-open-on-focus\" class=\"education-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><p ng-message=\"required\">Start Date is required</p><p ng-message=\"valid\">Start Date must be a valid date</p><p ng-message=\"maxdate\">Start Date should be less than Today</p></div></md-input-container><md-input-container class=\"flex\"><label>To</label><md-datepicker id=\"sup-j-education-endDate\" ng-model=\"$ctrl.model.endDate\" md-hide-icons=\"calendar\" md-min-date=\"$ctrl.model.startDate\" type=\"date\" name=\"endDate\" md-open-on-focus=\"md-open-on-focus\" class=\"education-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><p ng-message=\"valid\">End Date must be a valid date</p><p ng-message=\"mindate\">End Date should be greater than Start Date</p></div></md-input-container></div><md-input-container class=\"md-block\"><label>Degree</label><input id=\"sup-j-education-degree\" ng-model=\"$ctrl.model.degree\" name=\"degree\" required=\"required\" class=\"education-degree\"/><div ng-messages=\"editForm.degree.$error\"><p ng-message=\"required\">Degree is required</p></div></md-input-container><md-input-container class=\"md-block\"><label>Activities</label><textarea id=\"sup-j-education-activities\" ng-model=\"$ctrl.model.activities\" name=\"activities\" class=\"education-activities\"></textarea><div ng-messages=\"editForm.activities.$error\"><p ng-message=\"required\">Activities is required</p></div></md-input-container><md-button id=\"sup-j-education-save\" type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button id=\"sup-j-education-cancel\" ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
 $templateCache.put("components/profile/educations/educations.html","<profile-timeline-tile title=\"Education\" icon=\"school\" on-help=\"$ctrl.help($event)\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" add-button-enabled=\"!$ctrl.isInEditMode()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.items.length\" max-items-mobile=\"$ctrl.limitMobile\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><profile-timeline-item ng-repeat=\"education in $ctrl.items | limitTo: $ctrl.limitTo\" year=\"{{education.startDate | date:\'yyyy\'}}\" blocked=\"$ctrl.isBlocked(education)\" fixed-remove-icon=\"$ctrl.isEditing(education)\" on-remove=\"$ctrl.removeItem(education)\" read-only=\"$ctrl.readOnly\"><profile-education education=\"education\" editing=\"$ctrl.isEditing(education)\" on-edit=\"$ctrl.editItem(education)\" on-update=\"$ctrl.updateItem(education)\" on-cancel=\"$ctrl.cancelItem(education)\" read-only=\"$ctrl.readOnly\"></profile-education></profile-timeline-item></profile-timeline-tile>");
 $templateCache.put("components/profile/hobbies/hobbies.html","<profile-tile title=\"Hobbies\" icon=\"favorite_border\" on-help=\"$ctrl.help()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><div layout=\"row\" layout-wrap=\"layout-wrap\" class=\"hobbies-content\"><md-chips id=\"sup-j-profile-hobbies\" ng-model=\"$ctrl.user.hobbies\" md-transform-chip=\"$ctrl.newHobby($chip)\" readonly=\"$ctrl.readOnly\" md-on-add=\"$ctrl.save()\" md-on-remove=\"$ctrl.remove($chip)\" placeholder=\"Hobby name\" class=\"hobbies-text\"><md-chip-template><span>{{$chip.name}}</span></md-chip-template></md-chips></div></profile-tile>");
@@ -3662,15 +3045,6 @@ $templateCache.put("components/profile/languages/languages.html","<profile-tile 
 $templateCache.put("components/profile/qualificationSummary/qualificationSummary.html","<profile-tile title=\"Qualification Summary\" icon=\"assignment_turned_in\" on-help=\"$ctrl.help($event)\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><md-input-container class=\"md-block\"><textarea id=\"sup-j-profile-qualificationSummary\" ng-model=\"$ctrl.user.summaryOfQualification\" ng-if=\"$ctrl.readOnly\" readonly=\"$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"Qualification Summary\" class=\"qualification-summary\"></textarea><textarea id=\"sup-j-profile-qualificationSummary\" ng-model=\"$ctrl.user.summaryOfQualification\" ng-if=\"!$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"Qualification Summary\" class=\"qualification-summary\"></textarea></md-input-container></profile-tile>");
 $templateCache.put("components/profile/skills/skills.html","<profile-tile title=\"Skills\" icon=\"desktop_windows\" on-help=\"$ctrl.help()\" on-add-item=\"$ctrl.displayAutocomplete()\" on-show-more=\"$ctrl.showMore()\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.user.skillsCloud.length\" max-items-mobile=\"$ctrl.limitMobile\" disabled-show-more-button=\"$ctrl.disabledShowMoreButton\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" id=\"skills-tile\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" add-button-enabled=\"!$ctrl.disabledShowMoreButton\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><div flex-gt-sm=\"85\" flex=\"80\" layout=\"column\" class=\"skill-years-caption\"><div layout=\"row\" layout-align=\"space-between\"><div ng-repeat=\"year in [1, 3, 6, 9, 12, 15]\" class=\"skill-year\">{{year}}</div></div><div layout=\"row\" layout-align=\"space-between\"><div flex=\"\" ng-repeat=\"divider in [0, 1, 2, 3, 4]\" class=\"skill-year-divider\"></div></div></div><div layout=\"row\" layout-align=\"space-between none\" ng-show=\"$ctrl.showAutocomplete\" class=\"profile-list-item autocomplete\"><md-input-container md-no-float=\"\" flex=\"flex\"><md-autocomplete id=\"auto-complete-container\" ng-form=\"$ctrl.skillAutocompleteForm\" md-input-name=\"skillAutocomplete\" md-search-text=\"$ctrl.searchText\" md-items=\"item in $ctrl.querySearch($ctrl.searchText)\" md-item-text=\"item.name\" md-selected-item-change=\"$ctrl.addItem(item);\" placeholder=\"Skill name\" md-no-cache=\"true\" aria-label=\"Skill name\" md-autofocus=\"true\" md-require-match=\"true\"><md-item-template><span md-highlight-text=\"$ctrl.searchText\">{{ item.name }}</span></md-item-template></md-autocomplete><i id=\"sup-j-profile-skills-removeButton-new-skill\" ng-hide=\"$ctrl.readOnly\" ng-click=\"$ctrl.removeItem(skill)\" class=\"material-icons remove-icon\">clear</i><div ng-messages=\"$ctrl.skillAutocompleteForm.skillAutocomplete.$error\" ng-show=\"$ctrl.skillAutocompleteForm.skillAutocomplete.$touched\"><div ng-message=\"duplicate\">This skill already exists		</div></div></md-input-container></div><div layout=\"row\" layout-align=\"space-between none\" readonly=\"$ctrl.readOnly\" ng-repeat=\"skill in $ctrl.user.skillsCloud | limitTo: $ctrl.limitTo\" ng-form=\"skillForm\" class=\"profile-list-item mobile skill-container\"><div flex=\"grow\" layout=\"column\" class=\"skill-slider\"><md-input-container flex=\"flex\" md-no-float=\"\" ng-class=\"skill-repeat\"><input id=\"sup-j-profile-skillName-{{ skill.name.split(\' \').join(\'\') }}\" type=\"text\" ng-change=\"$ctrl.updateItem(skill)\" ng-model=\"skill.name\" name=\"skillName\" readonly=\"true\" ng-model-options=\"{updateOn: \'on blur\'}\" aria-label=\"Skill name\" skills-focus-on=\"$ctrl.focusItem()\" placeholder=\"Skill name\" required=\"required\"/></md-input-container><md-slider-container tabindex=\"-1\"><md-slider id=\"skill-slider\" min=\"{{$ctrl.min}}\" max=\"{{$ctrl.max}}\" md-discrete=\"\" ng-change=\"$ctrl.updateItem(skill)\" ng-model=\"skill.experienceYears\" ng-disabled=\"$ctrl.readOnly\" aria-label=\"skill-level\" name=\"experienceYears\" tabindex=\"-1\"></md-slider></md-slider-container><div class=\"md-errors-spacer\"></div><div class=\"error-messages\"><div ng-messages=\"skillForm.skillName.$error\" ng-if=\"skillForm.skillName.$touched\"><div ng-message=\"required\">Name cannot be empty</div></div><div ng-messages=\"skillForm.experienceYears.$error\" ng-if=\"skillForm.experienceYears.$touched\"><div ng-message=\"required\">Years cannot be empty</div><div ng-message=\"min\">Years cannot be less than 0</div></div></div></div><md-input-container flex-gt-sm=\"15\" flex=\"20\" class=\"skill-input\"><input id=\"sup-j-profile-skillNumber-{{ skill.name.split(\' \').join(\'\') }}\" type=\"number\" aria-controls=\"skill-slider\" min=\"{{$ctrl.min}}\" max=\"{{$ctrl.max}}\" ng-change=\"$ctrl.updateItem(skill)\" ng-model=\"skill.experienceYears\" readonly=\"$ctrl.readOnly\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 0, \'blur\': 0}}\" aria-label=\"skill-level\" required=\"required\" name=\"experienceYears\"/></md-input-container><i id=\"sup-j-profile-skills-removeButton-{{ skill.name.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.readOnly\" ng-click=\"$ctrl.removeItem(skill)\" class=\"material-icons remove-icon\">clear</i></div></profile-tile>");
 $templateCache.put("components/profile/tile/profileTile.html","<div ng-show=\"$ctrl.locked\" class=\"profile-tile-locker\"></div><div layout=\"row\" layout-align=\"start center\" class=\"profile-tile-header\"><div class=\"profile-tile-icon\"><i class=\"material-icons\">{{$ctrl.icon}}</i></div><div class=\"profile-tile-title\">{{$ctrl.title}}</div><i ng-click=\"$ctrl.onHelp({$event: $event})\" ng-hide=\"$ctrl.readOnly\" class=\"material-icons profile-tile-help-icon\">help</i></div><div ng-transclude=\"ng-transclude\" class=\"profile-tile-content mobile\"></div><div layout=\"column\"><md-button id=\"sup-j-profile-showMoreButton-{{ $ctrl.title.split(\' \').join(\'\') }}\" ng-disabled=\"$ctrl.disabledShowMoreButton\" ng-class=\"{\'add-button-flex\': $ctrl.addButtonFlex==\'true\'}\" ng-click=\"$ctrl.onShowMore(); $ctrl.changeShowMoreButtonText()\" ng-show=\"$ctrl.showShowMoreButton()\" class=\"profile-show-more-button md-raised md-primary\">{{$ctrl.showMoreText}}</md-button><md-button id=\"sup-j-profile-addButton-{{ $ctrl.title.split(\' \').join(\'\') }}\" ng-disabled=\"!$ctrl.addButtonEnabled || $ctrl.locked\" ng-class=\"{\'add-button-flex\': $ctrl.addButtonFlex==\'true\'}\" ng-click=\"$ctrl.onAddItem()\" class=\"profile-add-button md-raised md-primary\">Add</md-button></div>");
-=======
-$templateCache.put("components/profile/educations/educations.html","<profile-timeline-tile title=\"Education\" icon=\"school\" on-help=\"$ctrl.help($event)\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" add-button-enabled=\"!$ctrl.isInEditMode()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.items.length\" max-items-mobile=\"$ctrl.limitMobile\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><profile-timeline-item ng-repeat=\"education in $ctrl.items | limitTo: $ctrl.limitTo\" year=\"{{education.startDate | date:\'yyyy\'}}\" blocked=\"$ctrl.isBlocked(education)\" fixed-remove-icon=\"$ctrl.isEditing(education)\" on-remove=\"$ctrl.removeItem(education)\" read-only=\"$ctrl.readOnly\"><profile-education education=\"education\" editing=\"$ctrl.isEditing(education)\" on-edit=\"$ctrl.editItem(education)\" on-update=\"$ctrl.updateItem(education)\" on-cancel=\"$ctrl.cancelItem(education)\" read-only=\"$ctrl.readOnly\"></profile-education></profile-timeline-item></profile-timeline-tile>");
-$templateCache.put("components/profile/education/education.html","<div id=\"sup-j-profile-education-{{ $ctrl.model.field.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.editing\" ng-click=\"$ctrl.edit()\" class=\"details\"><h1><span class=\"education-degree\">{{$ctrl.model.degree}}</span> degree in <span class=\"education-field\">{{$ctrl.model.field}}</span> at <span class=\"education-name\">{{$ctrl.model.school}}</span></h1><div class=\"education-dates\"><span>From:&nbsp;</span><span class=\"education-start-date\">{{$ctrl.model.startDate | date: \'yyyy\'}}</span><span ng-show=\"$ctrl.model.endDate\">&nbsp;&nbsp;&nbsp;To:&nbsp;</span><span ng-show=\"$ctrl.model.endDate\" class=\"education-end-date\">{{$ctrl.model.endDate | date: \'yyyy\'}}</span></div><div class=\"education-activities\">{{$ctrl.model.activities}}</div></div><form name=\"editForm\" ng-if=\"$ctrl.editing\" ng-submit=\"$ctrl.update(editForm)\" novalidate=\"novalidate\"><md-input-container class=\"md-block\"><label>School Name</label><input id=\"sup-j-education-schoolName\" ng-model=\"$ctrl.model.school\" name=\"school\" autofocus=\"autofocus\" required=\"required\" class=\"education-school\"/><div ng-messages=\"editForm.school.$error\"><p ng-message=\"required\">School name is required</p></div></md-input-container><md-input-container class=\"md-block\"><label>Field</label><input id=\"sup-j-education-field\" ng-model=\"$ctrl.model.field\" name=\"field\" required=\"required\" class=\"education-field\"/><div ng-messages=\"editForm.field.$error\"><p ng-message=\"required\">Your field is required</p></div></md-input-container><div layout=\"row\"><md-input-container class=\"flex\"><label>From</label><md-datepicker id=\"sup-j-education-startDate\" ng-model=\"$ctrl.model.startDate\" md-hide-icons=\"calendar\" ng-required=\"true\" name=\"startDate\" type=\"date\" md-max-date=\"$ctrl.currentDate\" md-open-on-focus=\"md-open-on-focus\" class=\"education-start-date\"></md-datepicker><div ng-messages=\"editForm.startDate.$error\"><p ng-message=\"required\">Start Date is required</p><p ng-message=\"valid\">Start Date must be a valid date</p><p ng-message=\"maxdate\">Start Date should be less than Today</p></div></md-input-container><md-input-container class=\"flex\"><label>To</label><md-datepicker id=\"sup-j-education-endDate\" ng-model=\"$ctrl.model.endDate\" md-hide-icons=\"calendar\" md-min-date=\"$ctrl.model.startDate\" type=\"date\" name=\"endDate\" md-open-on-focus=\"md-open-on-focus\" class=\"education-end-date\"></md-datepicker><div ng-messages=\"editForm.endDate.$error\"><p ng-message=\"valid\">End Date must be a valid date</p><p ng-message=\"mindate\">End Date should be greater than Start Date</p></div></md-input-container></div><md-input-container class=\"md-block\"><label>Degree</label><input id=\"sup-j-education-degree\" ng-model=\"$ctrl.model.degree\" name=\"degree\" required=\"required\" class=\"education-degree\"/><div ng-messages=\"editForm.degree.$error\"><p ng-message=\"required\">Degree is required</p></div></md-input-container><md-input-container class=\"md-block\"><label>Activities</label><textarea id=\"sup-j-education-activities\" ng-model=\"$ctrl.model.activities\" name=\"activities\" class=\"education-activities\"></textarea><div ng-messages=\"editForm.activities.$error\"><p ng-message=\"required\">Activities is required</p></div></md-input-container><md-button id=\"sup-j-education-save\" type=\"submit\" class=\"profile-button md-raised md-primary\">Save</md-button><md-button id=\"sup-j-education-cancel\" ng-mousedown=\"$ctrl.cancel(editForm)\" class=\"profile-button md-raised md-secondary\">Cancel</md-button></form>");
-$templateCache.put("components/profile/hobbies/hobbies.html","<profile-tile title=\"Hobbies\" icon=\"favorite_border\" on-help=\"$ctrl.help()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><div layout=\"row\" layout-wrap=\"layout-wrap\" class=\"hobbies-content\"><md-chips id=\"sup-j-profile-hobbies\" ng-model=\"$ctrl.user.hobbies\" md-transform-chip=\"$ctrl.newHobby($chip)\" readonly=\"$ctrl.readOnly\" md-on-add=\"$ctrl.save()\" md-on-remove=\"$ctrl.remove($chip)\" placeholder=\"Hobby name\" class=\"hobbies-text\"><md-chip-template><span>{{$chip.name}}</span></md-chip-template></md-chips></div></profile-tile>");
-$templateCache.put("components/profile/languages/languages.html","<profile-tile title=\"Languages\" icon=\"language\" on-help=\"$ctrl.help()\" on-add-item=\"$ctrl.addItem()\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.user.languageSkills.length\" max-items-mobile=\"$ctrl.limitMobile\" disabled-show-more-button=\"$ctrl.disabledShowMoreButton\" add-button-enabled=\"!$ctrl.disabledShowMoreButton\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><div ng-repeat=\"language in $ctrl.user.languageSkills | limitTo: $ctrl.limitTo\" class=\"language-content\"><md-input-container md-no-float=\"\" class=\"md-block\"><i id=\"sup-j-profile-languages-removeButton-{{ language.name.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.readOnly\" ng-click=\"$ctrl.removeItem(language)\" class=\"material-icons remove-icon\">clear</i><input ng-if=\"$ctrl.readOnly\" id=\"sup-j-profile-language-{{ language.name.split(\' \').join(\'\') }}\" type=\"text\" flex=\"grow\" ng-change=\"$ctrl.doUpdate(language); $ctrl.enableShowMoreButton()\" ng-model=\"language.name\" ng-model-options=\"{updateOn: \'blur\'}\" readonly=\"$ctrl.readOnly\" aria-label=\"Language name\" required=\"required\" placeholder=\"Language name\" name=\"languageName_{{$index}}\" class=\"single-line\"/><input ng-if=\"!$ctrl.readOnly\" id=\"sup-j-profile-language-{{ language.name.split(\' \').join(\'\') }}\" type=\"text\" flex=\"grow\" ng-change=\"$ctrl.doUpdate(language); $ctrl.enableShowMoreButton()\" ng-model=\"language.name\" ng-model-options=\"{updateOn: \'blur\'}\" aria-label=\"Language name\" required=\"required\" placeholder=\"Language name\" name=\"languageName_{{$index}}\" class=\"single-line\"/><div layout=\"row\" class=\"language-grade-container\"><div ng-repeat=\"level in [1,2,3,4,5]\" ng-click=\"$ctrl.setLevel(language, level)\" ng-show=\"language._id\" class=\"language-grade\"><span ng-class=\"$ctrl.getLevelClass(language, level)\" ng-mouseenter=\"$ctrl.setHover(language, level)\" ng-mouseleave=\"$ctrl.unsetHover(language)\" class=\"empty\"><i class=\"material-icons\">grade</i></span></div></div><div ng-messages=\"languageForm[\'languageName_\'+$index].$error\"><div ng-message=\"required\">Name cannot be empty</div></div></md-input-container></div></profile-tile>");
-$templateCache.put("components/profile/qualificationSummary/qualificationSummary.html","<profile-tile title=\"Qualification Summary\" icon=\"assignment_turned_in\" on-help=\"$ctrl.help($event)\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><md-input-container class=\"md-block\"><textarea id=\"sup-j-profile-qualificationSummary\" ng-model=\"$ctrl.user.summaryOfQualification\" ng-if=\"$ctrl.readOnly\" readonly=\"$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"Qualification Summary\" class=\"qualification-summary\"></textarea><textarea id=\"sup-j-profile-qualificationSummary\" ng-model=\"$ctrl.user.summaryOfQualification\" ng-if=\"!$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"Qualification Summary\" class=\"qualification-summary\"></textarea></md-input-container></profile-tile>");
-$templateCache.put("components/profile/tile/profileTile.html","<div ng-show=\"$ctrl.locked\" class=\"profile-tile-locker\"></div><div layout=\"row\" layout-align=\"start center\" class=\"profile-tile-header\"><div class=\"profile-tile-icon\"><i class=\"material-icons\">{{$ctrl.icon}}</i></div><div class=\"profile-tile-title\">{{$ctrl.title}}</div><i ng-click=\"$ctrl.onHelp({$event: $event})\" ng-hide=\"$ctrl.readOnly\" class=\"material-icons profile-tile-help-icon\">help</i></div><div ng-transclude=\"ng-transclude\" class=\"profile-tile-content mobile\"></div><div layout=\"column\"><md-button id=\"sup-j-profile-showMoreButton-{{ $ctrl.title.split(\' \').join(\'\') }}\" ng-disabled=\"$ctrl.disabledShowMoreButton\" ng-class=\"{\'add-button-flex\': $ctrl.addButtonFlex==\'true\'}\" ng-click=\"$ctrl.onShowMore(); $ctrl.changeShowMoreButtonText()\" ng-show=\"$ctrl.showShowMoreButton()\" class=\"profile-show-more-button md-raised md-primary\">{{$ctrl.showMoreText}}</md-button><md-button id=\"sup-j-profile-addButton-{{ $ctrl.title.split(\' \').join(\'\') }}\" ng-disabled=\"!$ctrl.addButtonEnabled || $ctrl.locked\" ng-class=\"{\'add-button-flex\': $ctrl.addButtonFlex==\'true\'}\" ng-click=\"$ctrl.onAddItem()\" class=\"profile-add-button md-raised md-primary\">Add</md-button></div>");
-$templateCache.put("components/profile/skills/skills.html","<profile-tile title=\"Skills\" icon=\"desktop_windows\" on-help=\"$ctrl.help()\" on-add-item=\"$ctrl.displayAutocomplete()\" on-show-more=\"$ctrl.showMore()\" limit-items-mobile=\"$ctrl.limitTo\" items-length=\"$ctrl.user.skillsCloud.length\" max-items-mobile=\"$ctrl.limitMobile\" disabled-show-more-button=\"$ctrl.disabledShowMoreButton\" show-add-button=\"{{!$ctrl.readOnly}}\" add-button-flex=\"true\" id=\"skills-tile\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" add-button-enabled=\"!$ctrl.disabledShowMoreButton\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><div flex-gt-sm=\"85\" flex=\"80\" layout=\"column\" class=\"skill-years-caption\"><div layout=\"row\" layout-align=\"space-between\"><div ng-repeat=\"year in [1, 3, 6, 9, 12, 15]\" class=\"skill-year\">{{year}}</div></div><div layout=\"row\" layout-align=\"space-between\"><div flex=\"\" ng-repeat=\"divider in [0, 1, 2, 3, 4]\" class=\"skill-year-divider\"></div></div></div><div layout=\"row\" layout-align=\"space-between none\" ng-show=\"$ctrl.showAutocomplete\" class=\"profile-list-item autocomplete\"><md-input-container md-no-float=\"\" flex=\"flex\"><md-autocomplete id=\"auto-complete-container\" ng-form=\"$ctrl.skillAutocompleteForm\" md-input-name=\"skillAutocomplete\" md-search-text=\"$ctrl.searchText\" md-items=\"item in $ctrl.querySearch($ctrl.searchText)\" md-item-text=\"item.name\" md-selected-item-change=\"$ctrl.addItem(item);\" placeholder=\"Skill name\" md-no-cache=\"true\" aria-label=\"Skill name\" md-autofocus=\"true\" md-require-match=\"true\"><md-item-template><span md-highlight-text=\"$ctrl.searchText\">{{ item.name }}</span></md-item-template></md-autocomplete><i id=\"sup-j-profile-skills-removeButton-new-skill\" ng-hide=\"$ctrl.readOnly\" ng-click=\"$ctrl.removeItem(skill)\" class=\"material-icons remove-icon\">clear</i><div ng-messages=\"$ctrl.skillAutocompleteForm.skillAutocomplete.$error\" ng-show=\"$ctrl.skillAutocompleteForm.skillAutocomplete.$touched\"><div ng-message=\"duplicate\">This skill already exists		</div></div></md-input-container></div><div layout=\"row\" layout-align=\"space-between none\" readonly=\"$ctrl.readOnly\" ng-repeat=\"skill in $ctrl.user.skillsCloud | limitTo: $ctrl.limitTo\" ng-form=\"skillForm\" class=\"profile-list-item mobile skill-container\"><div flex=\"grow\" layout=\"column\" class=\"skill-slider\"><md-input-container flex=\"flex\" md-no-float=\"\" ng-class=\"skill-repeat\"><input id=\"sup-j-profile-skillName-{{ skill.name.split(\' \').join(\'\') }}\" type=\"text\" ng-change=\"$ctrl.updateItem(skill)\" ng-model=\"skill.name\" name=\"skillName\" readonly=\"true\" ng-model-options=\"{updateOn: \'on blur\'}\" aria-label=\"Skill name\" skills-focus-on=\"$ctrl.focusItem()\" placeholder=\"Skill name\" required=\"required\"/></md-input-container><md-slider-container tabindex=\"-1\"><md-slider id=\"skill-slider\" min=\"{{$ctrl.min}}\" max=\"{{$ctrl.max}}\" md-discrete=\"\" ng-change=\"$ctrl.updateItem(skill)\" ng-model=\"skill.experienceYears\" ng-disabled=\"$ctrl.readOnly\" aria-label=\"skill-level\" name=\"experienceYears\" tabindex=\"-1\"></md-slider></md-slider-container><div class=\"md-errors-spacer\"></div><div class=\"error-messages\"><div ng-messages=\"skillForm.skillName.$error\" ng-if=\"skillForm.skillName.$touched\"><div ng-message=\"required\">Name cannot be empty</div></div><div ng-messages=\"skillForm.experienceYears.$error\" ng-if=\"skillForm.experienceYears.$touched\"><div ng-message=\"required\">Years cannot be empty</div><div ng-message=\"min\">Years cannot be less than 0</div></div></div></div><md-input-container flex-gt-sm=\"15\" flex=\"20\" class=\"skill-input\"><input id=\"sup-j-profile-skillNumber-{{ skill.name.split(\' \').join(\'\') }}\" type=\"number\" aria-controls=\"skill-slider\" min=\"{{$ctrl.min}}\" max=\"{{$ctrl.max}}\" ng-change=\"$ctrl.updateItem(skill)\" ng-model=\"skill.experienceYears\" readonly=\"$ctrl.readOnly\" ng-model-options=\"{updateOn: \'default blur\', debounce:{\'default\': 0, \'blur\': 0}}\" aria-label=\"skill-level\" required=\"required\" name=\"experienceYears\"/></md-input-container><i id=\"sup-j-profile-skills-removeButton-{{ skill.name.split(\' \').join(\'\') }}\" ng-hide=\"$ctrl.readOnly\" ng-click=\"$ctrl.removeItem(skill)\" class=\"material-icons remove-icon\">clear</i></div></profile-tile>");
->>>>>>> bc91ee08e9e6517c8560ea071542bc2cbedb4f7e
 $templateCache.put("components/profile/timelineItem/timelineItem.html","<div ng-class=\"{\'active\': $ctrl.blocked}\" class=\"timeline-item-blocker\"></div><div class=\"profile-list-item\"><i id=\"sup-j-profile-timeline-removeButton-{{ $ctrl.year }}\" ng-hide=\"$ctrl.readOnly\" ng-click=\"$ctrl.onRemove()\" ng-class=\"{\'fixed\': $ctrl.fixedRemoveIcon}\" class=\"material-icons remove-icon\">clear</i><div class=\"timeline-year\">{{$ctrl.year || \"&nbsp;\"}}</div><div ng-transclude=\"ng-transclude\" class=\"timeline-item-content\"></div></div>");
 $templateCache.put("components/profile/timelineTile/timelineTile.html","<profile-tile title=\"{{$ctrl.title}}\" icon=\"{{$ctrl.icon}}\" on-help=\"$ctrl.onHelp({$event: $event})\" show-add-button=\"{{$ctrl.showAddButton}}\" add-button-flex=\"{{$ctrl.addButtonFlex}}\" add-button-enabled=\"$ctrl.addButtonEnabled &amp;&amp; !$ctrl.locked\" on-add-item=\"$ctrl.onAddItem()\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" limit-items-mobile=\"$ctrl.limitItemsMobile\" items-length=\"$ctrl.itemsLength\" max-items-mobile=\"$ctrl.maxItemsMobile\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><div class=\"timeline-bar\"></div><div ng-transclude=\"ng-transclude\" ng-click=\"\" class=\"timeline-tile-content mobile\"></div></profile-tile>");
 $templateCache.put("components/profile/topBar/topBar.html","<div id=\"sup-j-profile-topBar\" layout=\"row\" layout-xs=\"column\" layout-align-xs=\"center center\" flex-wrap=\"\"><img src=\"{{$ctrl.user.picture}}\"/><div layout=\"column\" layout-align-xs=\"center center\" class=\"details\"><div id=\"sup-j-profile-topBar-name\" class=\"name\">{{$ctrl.user.name | uppercase}}		</div><div id=\"sup-j-profile-topBar-position\" class=\"position\"><div><md-chips ng-model=\"$ctrl.userPositions\" md-transform-chip=\"$ctrl.transformChip($chip)\" readonly=\"$ctrl.readOnly\" md-on-add=\"$ctrl.addPosition()\" md-on-remove=\"$ctrl.removePosition($chip)\" md-max-chips=\"5\" md-require-match=\"true\"><md-autocomplete md-disabled=\"$ctrl.readOnly\" md-menu-class=\"position-autocomplete\" ng-hide=\"$ctrl.userPositions.length &gt; 5\" md-search-text=\"$ctrl.positionSearchText\" md-selected-item=\"$ctrl.positionSelectedItem\" md-items=\"item in $ctrl.getAvailablePositions($ctrl.positionSearchText)\" md-item-text=\"item\" placeholder=\"Add new role\"><span md-highlight-text=\"$ctrl.positionSearchText\" md-highlight-flags=\"i\">{{item}}</span></md-autocomplete><md-chip-template><span><strong>{{$chip.name}}		</strong></span></md-chip-template></md-chips></div></div></div><span flex=\"\"></span><div hide-xs=\"\" hide-sm=\"\" class=\"logo\"></div></div>");
