@@ -29,17 +29,17 @@ function getDataFromDB(User, username, domain, email, profile, token, done) {
   User.findOne({ 'username': username }).exec().then(function (user) {
     var tokenObject = token ? { 'ssoToken': token } : undefined;
     if (user) {
-      return done(null, user, tokenObject);
+      user.name = profile.displayName;
+      user.google = profile._json;
+    } else {
+      user = new User({
+        name: profile.displayName,
+        email: email,
+        username: username,
+        provider: 'google',
+        google: profile._json
+      });
     }
-
-    user = new User({
-      name: profile.displayName,
-      email: email,
-      username: username,
-      provider: 'google',
-      google: profile._json
-    });
-
     user.save().then(function (user) {
       return done(null, user, tokenObject);
     }).catch(function (err) {
@@ -60,53 +60,12 @@ function setup(User, config) {
     var fields = email.split('@');
     var username = fields[0];
     var domain = fields[1];
-    console.log('Google accessToken: ' + accessToken);
-    var endpoint = config.ssoUrl + '?access_token=' + accessToken;
 
-    (0, _request2.default)(endpoint, function (error, response, body) {
-      console.log('SSO endpoint: ' + endpoint);
-      console.log('SSO response: ' + response.statusCode + ' - ' + response.statusMessage);
-
-      var bodyToken = void 0;
-
-      if (config.domain !== domain) {
-        return done(null, false, { message: "error-message-invalid-account" });
-      }
-
-      if (error) {
-        console.log('SSO Error: ' + error);
-      }
-
-      var contentType = response.headers['content-type'];
-      console.log('SSO content type: ' + contentType);
-      switch (response.statusCode) {
-        case 200:
-          if (contentType === "text/html; charset=utf-8") {
-            bodyToken = { token: endpoint + ' + - 200 HTML' };
-            console.log('SSO 200 Status Code returning HTML: ' + response.body);
-          } else if (contentType === "application/json; charset=utf-8") {
-            bodyToken = JSON.parse(body);
-            console.log('SSO accessToken: ' + bodyToken.token);
-          } else {
-            bodyToken = { token: endpoint + ' + - 200 Unknown' };
-            console.log('SSO 200 Status Code returning content not identified: ' + response.body);
-          }
-          break;
-        case 401:
-          bodyToken = { token: endpoint + ' + - 401' };
-          console.log('SSO Unauthorized.');
-          break;
-        case 500:
-          bodyToken = { token: endpoint + ' + - 500' };
-          console.log('SSO Error: ' + body);
-          break;
-        default:
-          bodyToken = { token: endpoint + ' + - None' };
-          console.log('SSO Unrecognized Status Code: ' + body);
-      }
-
-      return getDataFromDB(User, username, domain, email, profile, bodyToken, done);
-    });
+    if (config.domain !== domain) {
+      return done(null, false, { message: "error-message-invalid-account" });
+    }
+    //TODO: removing SSO for now
+    return getDataFromDB(User, username, domain, email, profile, { 'token': '' }, done);
   }));
 }
 //# sourceMappingURL=../../auth/google/passport.js.map

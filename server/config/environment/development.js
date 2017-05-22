@@ -9,7 +9,7 @@ module.exports = {
   mongo: {
     uri: 'mongodb://192.168.1.2:27017/superstars-staging'
   },
-  ssoUrl: 'http://sso.avenuecode.io/api/ac-superstars/loginByToken'
+  ssoUrl: process.env.SSO_URI || 'http://sso.avenuecode.com/api/ac-superstars/loginByToken'
 
 };
 //# sourceMappingURL=../../config/environment/development.js.map

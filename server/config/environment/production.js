@@ -12,7 +12,7 @@ module.exports = {
 
   // MongoDB connection options
   mongo: {
-    uri: process.env.MONGOLAB_URI || 'mongodb://localhost/superstars'
+    uri: 'mongodb://192.168.1.2:27017/superstars-staging'
   },
   ssoUrl: process.env.SSO_URI || 'http://sso.avenuecode.com/api/ac-superstars/loginByToken'
 };
