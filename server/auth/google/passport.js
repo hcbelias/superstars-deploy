@@ -65,10 +65,7 @@ function setup(User, config) {
 
         (0, _request2.default)(endpoint, function (error, response, body) {
             console.log('SSO endpoint: ' + endpoint);
-            console.log('SSO response: ' + response.statusCode + ' - ' + response.statusMessage);
-
-            var bodyToken = void 0;
-
+            var bodyToken = { 'token': '' };
             if (config.domain !== domain) {
                 return done(null, false, { message: "error-message-invalid-account" });
             }
@@ -80,29 +77,25 @@ function setup(User, config) {
             if (response) {
                 var contentType = response.headers['content-type'];
                 console.log('SSO content type: ' + contentType);
+                console.log('SSO response: ' + response.statusCode + ' - ' + response.statusMessage);
                 switch (response.statusCode) {
                     case 200:
                         if (contentType === "text/html; charset=utf-8") {
-                            bodyToken = { token: endpoint + ' + - 200 HTML' };
                             console.log('SSO 200 Status Code returning HTML: ' + response.body);
                         } else if (contentType === "application/json; charset=utf-8") {
                             bodyToken = JSON.parse(body);
                             console.log('SSO accessToken: ' + bodyToken.token);
                         } else {
-                            bodyToken = { token: endpoint + ' + - 200 Unknown' };
                             console.log('SSO 200 Status Code returning content not identified: ' + response.body);
                         }
                         break;
                     case 401:
-                        bodyToken = { token: endpoint + ' + - 401' };
                         console.log('SSO Unauthorized.');
                         break;
                     case 500:
-                        bodyToken = { token: endpoint + ' + - 500' };
                         console.log('SSO Error: ' + body);
                         break;
                     default:
-                        bodyToken = { token: endpoint + ' + - None' };
                         console.log('SSO Unrecognized Status Code: ' + body);
                 }
             }
