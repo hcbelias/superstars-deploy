@@ -32,8 +32,9 @@ function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
   return function (entity) {
     if (entity) {
-      res.status(statusCode).json(entity);
+      return res.status(statusCode).json(entity);
     }
+    return res.status(404).end();
   };
 }
 
@@ -50,17 +51,17 @@ function removeEntity(res) {
   return function (entity) {
     if (entity) {
       return entity.remove().then(function () {
-        res.status(204).end();
+        return res.status(204).end();
       });
     }
+    return res.status(404).end();
   };
 }
 
 function handleEntityNotFound(res) {
   return function (entity) {
     if (!entity) {
-      res.status(404).end();
-      return null;
+      return res.status(404).end();
     }
     return entity;
   };
@@ -69,7 +70,7 @@ function handleEntityNotFound(res) {
 function handleError(res, statusCode) {
   statusCode = statusCode || 500;
   return function (err) {
-    res.status(statusCode).send(err);
+    return res.status(statusCode).send(err);
   };
 }
 

@@ -17,6 +17,7 @@ var router = new _express.Router();
 router.get('/', auth.isAuthenticated(), controller.index);
 router.get('/me', auth.isAuthenticated(), controller.me);
 router.get('/:username', controller.show);
+router.delete('/:username', auth.isAuthenticated(), controller.erase);
 
 //Export Resume
 router.get('/:username/resume-doc', controller.exportDOCX);
@@ -57,6 +58,7 @@ router.put('/:username/facebook', auth.isAuthenticated(), controller.updateFaceb
 router.put('/:username/linkedin', auth.isAuthenticated(), controller.updateLinkedin);
 router.put('/:username/twitter', auth.isAuthenticated(), controller.updateTwitter);
 router.put('/:username/skype', auth.isAuthenticated(), controller.updateSkype);
+router.put('/:username/onbench', auth.isAuthenticated(), controller.updateBench);
 
 module.exports = router;
 //# sourceMappingURL=../../api/user/index.js.map

@@ -11,6 +11,7 @@ var _keys2 = _interopRequireDefault(_keys);
 exports.index = index;
 exports.show = show;
 exports.update = update;
+exports.erase = erase;
 exports.me = me;
 exports.searchBySkill = searchBySkill;
 exports.updateSkill = updateSkill;
@@ -38,6 +39,7 @@ exports.updateFacebook = updateFacebook;
 exports.updateTwitter = updateTwitter;
 exports.updateLinkedin = updateLinkedin;
 exports.updateSkype = updateSkype;
+exports.updateBench = updateBench;
 exports.authCallback = authCallback;
 exports.exportDOCX = exportDOCX;
 exports.exportPDF = exportPDF;
@@ -99,6 +101,7 @@ var facebookContactProperty = 'facebook';
 var twitterContactProperty = 'twitter';
 var skypeContactProperty = 'skype';
 var linkedinContactProperty = 'linkedIn';
+var onBenchProperty = 'onBench';
 
 function findUserByUsername(username) {
   return _user2.default.findOne({
@@ -301,6 +304,20 @@ function update(req, res, next) {
     new: true
   }).exec().then(respondWithCompleteProfileResult(res)).catch(function (err) {
     return next(err);
+  });
+}
+
+/**
+ * Delete a single user
+ */
+function erase(req, res, next) {
+  var username = req.params.username;
+  console.log(username);
+
+  _user2.default.findOneAndRemove({
+    username: username
+  }, function (err) {
+    if (!err) res.status(204).send();else handleError(res);
   });
 }
 
@@ -508,6 +525,10 @@ function updateLinkedin(req, res, next) {
 
 function updateSkype(req, res, next) {
   return findUserAndUpdateProperty(req, res, updateSimpleField, skypeContactProperty);
+}
+
+function updateBench(req, res, next) {
+  return findUserAndUpdateProperty(req, res, updateSimpleField, onBenchProperty);
 }
 
 /**

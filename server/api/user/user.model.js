@@ -190,11 +190,16 @@ var UserSchema = new _mongoose.Schema({
   skillsCloud: [skillSchema],
   education: [educationSchema],
   certifications: [certificationSchema],
-  languageSkills: [languageSchema]
+  languageSkills: [languageSchema],
+  onBench: {
+    type: Boolean,
+    default: false
+  }
 }, {
   toJSON: {
     virtuals: true
-  }
+  },
+  timestamps: true
 });
 
 /**
@@ -233,7 +238,10 @@ UserSchema.virtual('completeProfile').get(function () {
     'aboutMe': this.aboutMe,
     'skillsCloud': this.skillsCloud,
     'experiences': this.experiences,
-    'hobbies': this.hobbies
+    'hobbies': this.hobbies,
+    'onBench': this.onBench,
+    'updatedAt': this.updatedAt,
+    'createdAt': this.createdAt
   };
 });
 

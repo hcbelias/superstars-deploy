@@ -41,7 +41,7 @@ function respondWithResult(res, statusCode) {
     if (entity) {
       return res.status(statusCode).json(entity);
     }
-    return null;
+    return [];
   };
 }
 
@@ -70,8 +70,7 @@ function removeEntity(res) {
 function handleEntityNotFound(res) {
   return function (entity) {
     if (!entity) {
-      res.status(404).end();
-      return null;
+      return res.status(404).end();
     }
     return entity;
   };

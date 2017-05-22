@@ -29,17 +29,17 @@ function getDataFromDB(User, username, domain, email, profile, token, done) {
   User.findOne({ 'username': username }).exec().then(function (user) {
     var tokenObject = token ? { 'ssoToken': token } : undefined;
     if (user) {
-      return done(null, user, tokenObject);
+      user.name = profile.displayName;
+      user.google = profile._json;
+    } else {
+      user = new User({
+        name: profile.displayName,
+        email: email,
+        username: username,
+        provider: 'google',
+        google: profile._json
+      });
     }
-
-    user = new User({
-      name: profile.displayName,
-      email: email,
-      username: username,
-      provider: 'google',
-      google: profile._json
-    });
-
     user.save().then(function (user) {
       return done(null, user, tokenObject);
     }).catch(function (err) {
