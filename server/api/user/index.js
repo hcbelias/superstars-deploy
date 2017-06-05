@@ -16,6 +16,7 @@ var router = new _express.Router();
 
 router.get('/', auth.isAuthenticated(), controller.index);
 router.get('/me', auth.isAuthenticated(), controller.me);
+router.get('/username', auth.isAuthenticated(), controller.getUsersByUsername);
 router.get('/:username', controller.show);
 router.delete('/:username', auth.isAuthenticated(), controller.erase);
 

@@ -1,27 +1,27 @@
 'use strict';
 
-angular.module('superstarsApp', ['superstarsApp.auth', 'superstarsApp.constants', 'superstarsApp.screen', 'ngCookies', 'ngResource', 'ngSanitize', 'btford.socket-io', 'ui.router', 'validation.match', 'ngMaterial', 'ngMessages', 'pascalprecht.translate', 'zInfiniteScroll', 'duScroll']).config(function ($urlRouterProvider, $locationProvider, $translateProvider, $mdThemingProvider, appConfig) {
-    $urlRouterProvider.otherwise('/');
-    $urlRouterProvider.rule(function ($injector, $location) {
+angular.module('superstarsApp', ['superstarsApp.auth', 'superstarsApp.constants', 'superstarsApp.screen', 'ngCookies', 'ngResource', 'ngSanitize', 'btford.socket-io', 'ui.router', 'validation.match', 'ngMaterial', 'ngMessages', 'pascalprecht.translate', 'zInfiniteScroll', 'duScroll', 'chart.js']).config(function ($urlRouterProvider, $locationProvider, $translateProvider, $mdThemingProvider, appConfig) {
+      $urlRouterProvider.otherwise('/');
+      $urlRouterProvider.rule(function ($injector, $location) {
 
-        var path = $location.path();
-        var hasTrailingSlash = path[path.length - 1] === '/';
+            var path = $location.path();
+            var hasTrailingSlash = path[path.length - 1] === '/';
 
-        if (hasTrailingSlash) {
+            if (hasTrailingSlash) {
 
-            //if last charcter is a slash, return the same url without the slash  
-            var newPath = path.substr(0, path.length - 1);
-            return newPath;
-        }
-    });
+                  //if last charcter is a slash, return the same url without the slash  
+                  var newPath = path.substr(0, path.length - 1);
+                  return newPath;
+            }
+      });
 
-    $locationProvider.html5Mode(true);
+      $locationProvider.html5Mode(true);
 
-    $translateProvider.useSanitizeValueStrategy('sanitize');
-    $translateProvider.translations('en', appConfig.I18N.en);
-    $translateProvider.preferredLanguage('en');
+      $translateProvider.useSanitizeValueStrategy('sanitize');
+      $translateProvider.translations('en', appConfig.I18N.en);
+      $translateProvider.preferredLanguage('en');
 
-    $mdThemingProvider.theme('default').primaryPalette('blue').warnPalette('orange');
+      $mdThemingProvider.theme('default').primaryPalette('blue').warnPalette('orange');
 });
 //# sourceMappingURL=../app/app.js.map
 'use strict';
@@ -256,6 +256,232 @@ angular.module('superstarsApp').controller('LogoutController', LogoutController)
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+  var CHART_TYPE_TOTAL = 'Developer per Skill';
+  var CHART_TYPE_EXPERIENCE = 'Experience per skill';
+
+  var ChartController = function () {
+    function ChartController(Skill, Chart, User) {
+      _classCallCheck(this, ChartController);
+
+      this.SkillService = Skill;
+      this.ChartService = Chart;
+      this.UserService = User;
+
+      this.chartTypes = [CHART_TYPE_TOTAL, CHART_TYPE_EXPERIENCE];
+
+      this.selectedSkills = [];
+      this.chartOptions = {
+        'legend': {
+          display: true
+        },
+        'scales': {
+          'yAxes': [{
+            'ticks': {
+              'beginAtZero': true,
+              'min': 0,
+              'stepSize': 1
+            }
+          }]
+        },
+        'callback': this.getUserCards.bind(this)
+      };
+      this.selectedChart = CHART_TYPE_TOTAL;
+      this.sort = true;
+      this.topResults = true;
+      this.bench = true;
+      this.noResults = false;
+      this.numberResults = 20;
+    }
+
+    _createClass(ChartController, [{
+      key: '$onInit',
+      value: function $onInit() {
+        this.SkillService.getSkills({}, this.loadAvailableSkills.bind(this));
+      }
+    }, {
+      key: 'loadAvailableSkills',
+      value: function loadAvailableSkills(data) {
+        this.items = data;
+      }
+    }, {
+      key: 'querySearch',
+      value: function querySearch(query) {
+        var results = query ? this.items.filter(this.createFilterFor(query)) : this.items;
+        return results;
+      }
+    }, {
+      key: 'createFilterFor',
+      value: function createFilterFor(query) {
+        var lowercaseQuery = angular.lowercase(query);
+
+        return function filterFn(skill) {
+          return angular.lowercase(skill.name).indexOf(lowercaseQuery) === 0;
+        };
+      }
+    }, {
+      key: 'selectUsers',
+      value: function selectUsers() {
+        if (arguments[2]) {
+          var index = arguments[2]._index;
+          var users = this.chart.options.info[index].users;
+          this.chart.options.callback(users);
+        }
+      }
+    }, {
+      key: 'isChartPerTotal',
+      value: function isChartPerTotal() {
+        return this.selectedChart === CHART_TYPE_TOTAL;
+      }
+    }, {
+      key: 'getUserCards',
+      value: function getUserCards(users) {
+        if (!this.isChartPerTotal()) {
+          users = users.map(function (v) {
+            return v.user;
+          });
+        }
+        this.UserService.getUsers({ q: users }, this.loadUserCard.bind(this));
+      }
+    }, {
+      key: 'loadUserCard',
+      value: function loadUserCard(data) {
+        this.userList = data;
+      }
+    }, {
+      key: 'generateChart',
+      value: function generateChart() {
+        var endpoint = void 0;
+        var callback = void 0;
+        if (this.topResults && !this.numberResults) {
+          return;
+        }
+        switch (this.selectedChart) {
+          case CHART_TYPE_TOTAL:
+            endpoint = this.ChartService.getTotalPerSkill;
+            callback = this.loadReportTotalData.bind(this);
+            break;
+          case CHART_TYPE_EXPERIENCE:
+            endpoint = this.ChartService.getExperiencePerSkill;
+            callback = this.loadReportExperienceData.bind(this);
+            break;
+          default:
+            return;
+        }
+        var skillList = this.selectedSkills.map(function (obj) {
+          return obj.name;
+        });
+        this.userList = [];
+        endpoint({ onlyBench: this.bench, skills: skillList }, callback);
+      }
+    }, {
+      key: 'setReportData',
+      value: function setReportData(reportData, legend) {
+        this.chartOptions.legend.display = legend;
+        this.noResults = reportData.length === 0;
+        //updating options to send data through chart lib
+        this.chartOptions.info = reportData;
+      }
+    }, {
+      key: 'filterResult',
+      value: function filterResult(reportData) {
+        if (this.topResults) {
+          reportData = reportData.slice(0, this.numberResults);
+        }
+        return reportData;
+      }
+    }, {
+      key: 'loadReportTotalData',
+      value: function loadReportTotalData(reportData) {
+        var _this = this;
+
+        //Sort
+        reportData = reportData.sort(function (a, b) {
+          return _this.sort ? b.users.length - a.users.length : a.users.length - b.users.length;
+        });
+
+        //Filter
+        reportData = this.filterResult(reportData);
+
+        //Build Report
+        this.data = reportData.map(function (obj) {
+          return obj.users.length;
+        });
+        this.labels = reportData.map(function (obj) {
+          return obj._id;
+        });
+
+        //Set data
+        this.setReportData(reportData, false);
+      }
+    }, {
+      key: 'loadReportExperienceData',
+      value: function loadReportExperienceData(reportData) {
+        var years = [].concat(_toConsumableArray(new Set(reportData.map(function (obj) {
+          return obj._id.exp;
+        }))));
+        var skills = [].concat(_toConsumableArray(new Set(reportData.map(function (obj) {
+          return obj._id.name;
+        }))));
+        var filter = function filter(name) {
+          return function (obj) {
+            return obj._id.name === name;
+          };
+        };
+        var data = [];
+        for (var i = 0; i < skills.length; i++) {
+          var skillArray = Array.from({ length: years.length }, function () {
+            return 0;
+          });
+          var skillData = reportData.filter(filter(skills[i]));
+          for (var j = 0; j < skillData.length; j++) {
+            if (skillData[j]._id.exp > 15) {
+              skillArray[15] += skillData[j].users.length;
+            } else {
+              skillArray[skillData[j]._id.exp] += skillData[j].users.length;
+            }
+          }
+          data.push(skillArray);
+        }
+        //unique skills
+        this.series = skills;
+        this.labels = years.sort(function (a, b) {
+          return a - b;
+        });
+
+        this.data = data;
+
+        this.setReportData(reportData, true);
+      }
+    }]);
+
+    return ChartController;
+  }();
+
+  angular.module('superstarsApp').component('chart', {
+    templateUrl: 'app/chart/chart.html',
+    controller: ChartController
+  });
+})();
+//# sourceMappingURL=../../app/chart/chart.controller.js.map
+'use strict';
+
+angular.module('superstarsApp').config(function ($stateProvider) {
+    $stateProvider.state('chart', {
+        url: '/chart',
+        template: '<chart layout="column" flex></profile>',
+        authenticate: true
+    });
+});
+//# sourceMappingURL=../../app/chart/chart.js.map
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function () {
@@ -320,141 +546,148 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function () {
-  var SUCCESS_MESSAGE = 'Profile updated.';
-  var ERROR_MESSAGE = 'Sorry, we did something wrong. Please, contact Superstars team.';
-  var PUBLIC_PROFILE_STATE_NAME = 'publicprofile';
+    var SUCCESS_MESSAGE = 'Profile updated.';
+    var ERROR_MESSAGE = 'Sorry, we did something wrong. Please, contact Superstars team.';
+    var PUBLIC_PROFILE_STATE_NAME = 'publicprofile';
 
-  var ProfileController = function () {
-    function ProfileController(User, $stateParams, $mdToast, Auth, $state, $cacheFactory, ProfileService) {
-      _classCallCheck(this, ProfileController);
+    var ProfileController = function () {
+        function ProfileController(User, $stateParams, $mdToast, Auth, $state, $cacheFactory, ProfileService) {
+            _classCallCheck(this, ProfileController);
 
-      this.User = User;
-      this.StateParams = $stateParams;
-      this.Auth = Auth;
-      this.Toast = $mdToast;
-      this.state = $state;
-      this.hideSection = false;
-      this.readOnly = true;
-      this.cf = $cacheFactory;
-      this.ProfileService = ProfileService;
-    }
-
-    _createClass(ProfileController, [{
-      key: '$onInit',
-      value: function $onInit() {
-        this.User.getProfile({ username: this.StateParams.username }, this.loadData.bind(this), this.redirectToMainPageOnError.bind(this, this.StateParams.username));
-        this.readOnly = !this.Auth.hasPermissionToEdit(this.StateParams.username) || this.isPublicProfile();
-        this.setHideSection(this.state);
-      }
-    }, {
-      key: 'loadData',
-      value: function loadData(data) {
-        this.user = data;
-      }
-    }, {
-      key: 'isPublicProfile',
-      value: function isPublicProfile() {
-        return this.state.current.name === PUBLIC_PROFILE_STATE_NAME;
-      }
-    }, {
-      key: 'setHideSection',
-      value: function setHideSection() {
-        this.hideSection = this.isPublicProfile();
-      }
-    }, {
-      key: 'updateNewPropertyId',
-      value: function updateNewPropertyId(field) {
-        var userData = this.user;
-        var toast = this.Toast.show;
-        var toastBuilder = this.Toast.simple;
-        var buildToastFunc = this.buildToastMessage;
-
-        return function (data) {
-          var index = userData[field].findIndex(function (item) {
-            return !item._id;
-          });
-          userData[field][index] = data.toJSON();
-          buildToastFunc(SUCCESS_MESSAGE, toast, toastBuilder);
-        };
-      }
-    }, {
-      key: 'showSuccessMessage',
-      value: function showSuccessMessage() {
-        return this.showMessage(SUCCESS_MESSAGE);
-      }
-    }, {
-      key: 'showErrorMessage',
-      value: function showErrorMessage() {
-        return this.showMessage(ERROR_MESSAGE);
-      }
-    }, {
-      key: 'redirectToMainPageOnError',
-      value: function redirectToMainPageOnError(username, error) {
-        if (error.status === 404) {
-          this.buildToastMessage('User not found: \'' + username + '\'.', this.Toast.show, this.Toast.simple);
-        } else {
-          this.buildToastMessage(SUCCESS_MESSAGE, this.Toast.show, this.Toast.simple);
+            this.User = User;
+            this.StateParams = $stateParams;
+            this.Auth = Auth;
+            this.Toast = $mdToast;
+            this.state = $state;
+            this.hideSection = false;
+            this.readOnly = true;
+            this.cf = $cacheFactory;
+            this.ProfileService = ProfileService;
         }
-        this.state.go('main');
-      }
-    }, {
-      key: 'showMessage',
-      value: function showMessage(message) {
-        var toast = this.Toast.show;
-        var toastBuilder = this.Toast.simple;
-        var buildToastFunc = this.buildToastMessage;
-        return function () {
-          return buildToastFunc(message, toast, toastBuilder);
-        };
-      }
-    }, {
-      key: 'buildToastMessage',
-      value: function buildToastMessage(message, toast, toastBuilder) {
-        toast(toastBuilder().textContent(message).position('bottom right'));
-      }
-    }, {
-      key: 'updateSimpleField',
-      value: function updateSimpleField(path, value) {
-        this.User.updateProfile({ username: this.user.username, path: path, data: value }, this.showSuccessMessage(), this.showErrorMessage());
-      }
-    }, {
-      key: 'updateComplexField',
-      value: function updateComplexField(path, object) {
-        this.User.updateProfile({ username: this.user.username, path: path, data: object, id: object._id }, this.showSuccessMessage(), this.showErrorMessage());
-      }
-    }, {
-      key: 'save',
-      value: function save(path, object, field) {
-        this.User.saveProfile({ username: this.user.username, path: path, data: object }, this.updateNewPropertyId(field), this.showErrorMessage());
-      }
-    }, {
-      key: 'delete',
-      value: function _delete(path, id) {
-        this.User.deleteProfile({ username: this.user.username, path: path, id: id }, this.showSuccessMessage(), this.showErrorMessage());
-      }
-    }, {
-      key: 'deleteProfile',
-      value: function deleteProfile() {
-        if (this.Auth.isAdmin()) {
-          var that = this;
-          this.User.deleteWholeProfile({ username: this.user.username }, function () {
-            that.showSuccessMessage();
-            that.cf.get('$http').removeAll();
-            that.state.go('main');
-          }, this.showErrorMessage());
-        } else {
-          this.ProfileService.help('Unauthorized', 'Only administrators are allowed to delete a profile.');
-        }
-      }
-    }]);
 
-    return ProfileController;
-  }();
+        _createClass(ProfileController, [{
+            key: '$onInit',
+            value: function $onInit() {
+                this.Auth.hasPermissionToEdit(this.StateParams.username).then(this.setReadOnly.bind(this));
+                this.User.getProfile({ username: this.StateParams.username }, this.loadData.bind(this), this.redirectToMainPageOnError.bind(this, this.StateParams.username));
+                this.setHideSection(this.state);
+            }
+        }, {
+            key: 'loadData',
+            value: function loadData(data) {
+                this.user = data;
+            }
+        }, {
+            key: 'isPublicProfile',
+            value: function isPublicProfile(state) {
+                return state.current.name === PUBLIC_PROFILE_STATE_NAME;
+            }
+        }, {
+            key: 'setHideSection',
+            value: function setHideSection() {
+                this.hideSection = this.isPublicProfile(this.state);
+            }
+        }, {
+            key: 'setReadOnly',
+            value: function setReadOnly(user) {
+                var isAdmin = user.hasOwnProperty('role') ? this.Auth.compareRole(user.role, 'admin') : false;
+                //ReadOnly - Public Profile or user is not admin and it is not his profile
+                this.readOnly = this.isPublicProfile(this.state) || !isAdmin && this.StateParams.username !== user.username;
+            }
+        }, {
+            key: 'updateNewPropertyId',
+            value: function updateNewPropertyId(field) {
+                var userData = this.user;
+                var toast = this.Toast.show;
+                var toastBuilder = this.Toast.simple;
+                var buildToastFunc = this.buildToastMessage;
 
-  angular.module('superstarsApp').component('profile', {
-    templateUrl: 'app/profile/profile.html',
-    controller: ProfileController
-  });
+                return function (data) {
+                    var index = userData[field].findIndex(function (item) {
+                        return !item._id;
+                    });
+                    userData[field][index] = data.toJSON();
+                    buildToastFunc(SUCCESS_MESSAGE, toast, toastBuilder);
+                };
+            }
+        }, {
+            key: 'showSuccessMessage',
+            value: function showSuccessMessage() {
+                return this.showMessage(SUCCESS_MESSAGE);
+            }
+        }, {
+            key: 'showErrorMessage',
+            value: function showErrorMessage() {
+                return this.showMessage(ERROR_MESSAGE);
+            }
+        }, {
+            key: 'redirectToMainPageOnError',
+            value: function redirectToMainPageOnError(username, error) {
+                if (error.status === 404) {
+                    this.buildToastMessage('User not found: \'' + username + '\'.', this.Toast.show, this.Toast.simple);
+                } else {
+                    this.buildToastMessage(SUCCESS_MESSAGE, this.Toast.show, this.Toast.simple);
+                }
+                this.state.go('main');
+            }
+        }, {
+            key: 'showMessage',
+            value: function showMessage(message) {
+                var toast = this.Toast.show;
+                var toastBuilder = this.Toast.simple;
+                var buildToastFunc = this.buildToastMessage;
+                return function () {
+                    return buildToastFunc(message, toast, toastBuilder);
+                };
+            }
+        }, {
+            key: 'buildToastMessage',
+            value: function buildToastMessage(message, toast, toastBuilder) {
+                toast(toastBuilder().textContent(message).position('bottom right'));
+            }
+        }, {
+            key: 'updateSimpleField',
+            value: function updateSimpleField(path, value) {
+                this.User.updateProfile({ username: this.user.username, path: path, data: value }, this.showSuccessMessage(), this.showErrorMessage());
+            }
+        }, {
+            key: 'updateComplexField',
+            value: function updateComplexField(path, object) {
+                this.User.updateProfile({ username: this.user.username, path: path, data: object, id: object._id }, this.showSuccessMessage(), this.showErrorMessage());
+            }
+        }, {
+            key: 'save',
+            value: function save(path, object, field) {
+                this.User.saveProfile({ username: this.user.username, path: path, data: object }, this.updateNewPropertyId(field), this.showErrorMessage());
+            }
+        }, {
+            key: 'delete',
+            value: function _delete(path, id) {
+                this.User.deleteProfile({ username: this.user.username, path: path, id: id }, this.showSuccessMessage(), this.showErrorMessage());
+            }
+        }, {
+            key: 'deleteProfile',
+            value: function deleteProfile() {
+                if (this.Auth.isAdmin()) {
+                    var that = this;
+                    this.User.deleteWholeProfile({ username: this.user.username }, function () {
+                        that.showSuccessMessage();
+                        that.cf.get('$http').removeAll();
+                        that.state.go('main');
+                    }, this.showErrorMessage());
+                } else {
+                    this.ProfileService.help('Unauthorized', 'Only administrators are allowed to delete a profile.');
+                }
+            }
+        }]);
+
+        return ProfileController;
+    }();
+
+    angular.module('superstarsApp').component('profile', {
+        templateUrl: 'app/profile/profile.html',
+        controller: ProfileController
+    });
 })();
 //# sourceMappingURL=../../app/profile/profile.controller.js.map
 'use strict';
@@ -500,12 +733,12 @@ angular.module('superstarsApp').config(function ($stateProvider) {
       },
 
 
-      /**
+      /*
        * Create a new user
        *
        * @param  {Object}   user     - user info
        * @param  {Function} callback - optional, function(error, user)
-       * @returns {Promise}
+       * @return {Promise}
        */
       createUser: function createUser(user, callback) {
         return User.save(user, function (data) {
@@ -519,12 +752,12 @@ angular.module('superstarsApp').config(function ($stateProvider) {
       },
 
 
-      /**
+      /*
        * Gets all available info on a user
        *   (synchronous|asynchronous)
        *
        * @param  {Function|*} callback - optional, funciton(user)
-       * @returns {Object|Promise}
+       * @return {Object|Promise}
        */
       getCurrentUser: function getCurrentUser(callback) {
         if (arguments.length === 0) {
@@ -542,12 +775,12 @@ angular.module('superstarsApp').config(function ($stateProvider) {
       },
 
 
-      /**
+      /*
        * Check if a user is logged in
        *   (synchronous|asynchronous)
        *
        * @param  {Function|*} callback - optional, function(is)
-       * @returns {Bool|Promise}
+       * @return {Bool|Promise}
        */
       isLoggedIn: function isLoggedIn(callback) {
         if (arguments.length === 0) {
@@ -565,13 +798,13 @@ angular.module('superstarsApp').config(function ($stateProvider) {
       },
 
 
-      /**
+      /*
        * Check if a user has a specified role or higher
        *   (synchronous|asynchronous)
        *
        * @param  {String}     role     - the role to check against
        * @param  {Function|*} callback - optional, function(has)
-       * @returns {Bool|Promise}
+       * @return {Bool|Promise}
        */
       hasRole: function hasRole(role, callback) {
         if (arguments.length < 2) {
@@ -586,7 +819,7 @@ angular.module('superstarsApp').config(function ($stateProvider) {
       },
 
 
-      /**
+      /*
        * Check if a user is an admin
        *   (synchronous|asynchronous)
        *
@@ -601,18 +834,15 @@ angular.module('superstarsApp').config(function ($stateProvider) {
       /**
        * Get auth token
        *
-       * @returns {String} - a token string used for authenticating
+       * @return {String} - a token string used for authenticating
        */
       getToken: function getToken() {
         return $cookies.get('token');
       },
-      hasPermissionToEdit: function hasPermissionToEdit(profileUserName) {
+      hasPermissionToEdit: function hasPermissionToEdit() {
         var user = Auth.getCurrentUser();
         var userData = user.hasOwnProperty('$promise') && user.hasOwnProperty('$resolved') && !user.$resolved ? user.$promise : user;
-        return $q.when(userData).then(function (user) {
-          var isAdmin = user.hasOwnProperty('role') ? Auth.compareRole(user.role, 'admin') : false;
-          return isAdmin || profileUserName === user.username;
-        });
+        return $q.when(userData);
       }
     };
 
@@ -2491,6 +2721,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 'use strict';
 
 (function () {
+    function ChartService($resource) {
+        return $resource('/api/charts/:chart', {
+            chart: '@chart'
+        }, {
+            getTotalPerSkill: {
+                method: 'GET',
+                isArray: true,
+                params: {
+                    chart: 'total-per-skill'
+                }
+            },
+            getExperiencePerSkill: {
+                method: 'GET',
+                isArray: true,
+                params: {
+                    chart: 'experience-per-skill'
+                }
+            }
+        });
+    }
+    angular.module('superstarsApp').factory('Chart', ChartService);
+})();
+//# sourceMappingURL=../../components/services/chart.service.js.map
+'use strict';
+
+(function () {
   function PositionResource($resource) {
     return $resource('/api/positions', {}, {
       getPositions: {
@@ -2543,6 +2799,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         method: 'GET',
         params: {
           username: ''
+        },
+        isArray: true,
+        cache: true
+      },
+      getUsers: {
+        method: 'GET',
+        params: {
+          username: 'username'
         },
         isArray: true,
         cache: true
@@ -2805,7 +3069,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: '$onInit',
       value: function $onInit() {
         var userSocial = this.user.social || {};
-
         this.socialUrls = {
           facebook: this.config.socialMedia.facebookUrl + (userSocial.facebook || ''),
           twitter: this.config.socialMedia.twitterUrl + (userSocial.twitter || ''),
@@ -2819,7 +3082,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'click',
       value: function click() {
-        this.$state.go('profile', { username: this.user.username });
+        if (this.newTab) {
+          var url = this.$state.href('profile', { username: this.user.username });
+          window.open(url, '_blank');
+        } else {
+          this.$state.go('profile', { username: this.user.username });
+        }
       }
     }]);
 
@@ -2831,7 +3099,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     controller: UserCardController,
     bindings: {
       user: '<',
-      onClick: '&'
+      newTab: '<'
     }
   });
 })();
@@ -2891,11 +3159,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           that.loaded = true;
         }, 0);
       }
-    }, {
-      key: 'click',
-      value: function click(user) {
-        this.onClick({ user: user });
-      }
     }]);
 
     return UserListController;
@@ -2903,10 +3166,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
   angular.module('superstarsApp').component('userList', {
     templateUrl: 'components/userList/userList.html',
-    controller: UserListController,
-    bindings: {
-      onClick: '&'
-    }
+    controller: UserListController
   });
 })();
 //# sourceMappingURL=../../components/userList/userList.component.js.map
@@ -2932,6 +3192,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           icon: 'home',
           sref: 'main',
           show: 'all',
+          target: ''
+        }, {
+          name: 'Charts',
+          icon: 'trending_up',
+          sref: 'chart()',
+          show: 'all',
+          onlyAdmin: true,
           target: ''
         }, {
           name: 'My Profile',
@@ -3022,7 +3289,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   angular.module('superstarsApp.util').factory('Util', UtilService);
 })();
 //# sourceMappingURL=../../components/util/util.service.js.map
-angular.module("superstarsApp").run(["$templateCache", function($templateCache) {$templateCache.put("app/main/main.html","<user-list layout=\"column\" flex=\"flex\"></user-list>");
+angular.module("superstarsApp").run(["$templateCache", function($templateCache) {$templateCache.put("app/chart/chart.html","<md-content><div layout=\"column\" layout-wrap=\"layout-wrap\" flex=\"flex\" class=\"container\"><md-card-title><md-card-title-text><span class=\"md-headline\">Charts</span></md-card-title-text></md-card-title><md-card-content layout=\"row\"><div layout=\"column\" flex=\"10\"><md-input-container><label>Chart Type</label><md-select ng-model=\"$ctrl.selectedChart\" required=\"required\" class=\"dropdown\">           <md-option ng-repeat=\"type in $ctrl.chartTypes\" ng-value=\"type\">{{type}}      </md-option></md-select></md-input-container><md-checkbox ng-model=\"$ctrl.bench\" aria-label=\"Only bench\" class=\"checkbox\">Only bench</md-checkbox><md-checkbox ng-model=\"$ctrl.topResults\" aria-label=\"Top results\" ng-show=\"$ctrl.isChartPerTotal()\" class=\"checkbox\">Top results</md-checkbox><md-input-container ng-show=\"$ctrl.topResults &amp;&amp; $ctrl.isChartPerTotal()\" class=\"md-block\"><label>Number of Results</label><input type=\"number\" ng-model=\"$ctrl.numberResults\" min=\"1\" max=\"200\" required=\"required\"/></md-input-container><md-chips ng-model=\"$ctrl.selectedSkills\" md-autocomplete-snap=\"\" md-require-match=\"true\" layout=\"row\"><md-autocomplete md-selected-item=\"$ctrl.selectedItem\" md-search-text=\"$ctrl.searchText\" md-items=\"item in $ctrl.querySearch($ctrl.searchText)\" md-item-text=\"item.name\" placeholder=\"Search for a skill\"><span md-highlight-text=\"$ctrl.searchText\">{{item.name}}</span></md-autocomplete><md-chip-template><span><strong>{{$chip.name}}</strong></span></md-chip-template></md-chips><md-switch ng-model=\"$ctrl.sort\" aria-label=\"Sort descending\" ng-show=\"$ctrl.isChartPerTotal()\">Sort Desc.	  </md-switch><md-button ng-click=\"$ctrl.generateChart()\" class=\"md-raised md-primary\">Generate Chart</md-button></div><div layout=\"column\" flex=\"90\" class=\"chart-container\"> <canvas id=\"bar\" chart-series=\"$ctrl.series\" chart-data=\"$ctrl.data\" chart-labels=\"$ctrl.labels\" chart-options=\"$ctrl.chartOptions\" ng-hide=\"$ctrl.noResults\" chart-click=\"$ctrl.selectUsers\" class=\"chart chart-bar\"></canvas><md-toolbar ng-show=\"$ctrl.noResults\"> <div class=\"md-toolbar-tools\"><h2 class=\"md-flex\">No results</h2></div></md-toolbar></div></md-card-content><div md-scroll-y=\"md-scroll-y\" layout=\"row\" layout-wrap=\"layout-wrap\" flex=\"flex\"><user-card ng-repeat=\"user in $ctrl.userList\" flex-xs=\"100\" flex-sm=\"50\" flex=\"25\" user=\"user\" new-tab=\"true\"></user-card></div></div></md-content>");
+$templateCache.put("app/main/main.html","<user-list layout=\"column\" flex=\"flex\"></user-list>");
 $templateCache.put("app/profile/profile.html","<md-content md-scroll-y=\"md-scroll-y\"><profile-admin-bar user=\"$ctrl.user\" on-update=\"$ctrl.updateSimpleField(path, value)\" delete-profile=\"$ctrl.deleteProfile()\" ng-show=\"$ctrl.Auth.isAdmin() &amp;&amp; !$ctrl.hideSection\"></profile-admin-bar><div layout=\"column\" layout-wrap=\"layout-wrap\" flex=\"flex\" id=\"superstars-profile\" class=\"container\"><top-bar user=\"$ctrl.user\" read-only=\"$ctrl.readOnly\" test=\"$ctrl.save\" on-save=\"$ctrl.save(path, object, field)\" on-delete=\"$ctrl.delete(path, id)\" flex=\"flex\"></top-bar><div layout=\"row\" layout-xs=\"column\" layout-sm=\"column\" class=\"profile-details flex\"><div layout=\"column\" flex=\"flex\" class=\"profile-column left\"><profile-contacts user=\"$ctrl.user\" on-update=\"$ctrl.updateSimpleField(path, value)\" read-only=\"$ctrl.readOnly\" ng-hide=\"$ctrl.hideSection\"></profile-contacts><profile-about-me user=\"$ctrl.user\" on-update=\"$ctrl.updateSimpleField(path, value)\" read-only=\"$ctrl.readOnly\"></profile-about-me><profile-qualification-summary user=\"$ctrl.user\" on-update=\"$ctrl.updateSimpleField(path, value)\" read-only=\"$ctrl.readOnly\"></profile-qualification-summary><profile-skills user=\"$ctrl.user\" on-update=\"$ctrl.updateComplexField(path, object)\" on-save=\"$ctrl.save(path, object, field)\" on-delete=\"$ctrl.delete(path, id)\" read-only=\"$ctrl.readOnly\"></profile-skills><profile-languages user=\"$ctrl.user\" on-update=\"$ctrl.updateComplexField(path, object)\" on-save=\"$ctrl.save(path, object, field)\" on-delete=\"$ctrl.delete(path, id)\" read-only=\"$ctrl.readOnly\"></profile-languages></div><div layout=\"column\" flex=\"none\" class=\"profile-column right\"><profile-educations items=\"$ctrl.user.education\" on-update=\"$ctrl.updateComplexField(path, object)\" on-save=\"$ctrl.save(path, object, field)\" on-delete=\"$ctrl.delete(path, id)\" read-only=\"$ctrl.readOnly\"></profile-educations><profile-certifications items=\"$ctrl.user.certifications\" on-update=\"$ctrl.updateComplexField(path, object)\" on-save=\"$ctrl.save(path, object, field)\" on-delete=\"$ctrl.delete(path, id)\" read-only=\"$ctrl.readOnly\"></profile-certifications><profile-working-experiences items=\"$ctrl.user.experiences\" on-update=\"$ctrl.updateComplexField(path, object)\" on-save=\"$ctrl.save(path, object, field)\" on-delete=\"$ctrl.delete(path, id)\" read-only=\"$ctrl.readOnly\"></profile-working-experiences><profile-hobbies user=\"$ctrl.user\" on-save=\"$ctrl.save(path, object, field)\" on-delete=\"$ctrl.delete(path, id)\" read-only=\"$ctrl.readOnly\"></profile-hobbies></div></div></div></md-content>");
 $templateCache.put("components/footer/footer.html","<div class=\"container\"><p>Angular Fullstack v3.7.5 | <a href=\"https://twitter.com/tyhenkel\">@tyhenkel</a> | <a href=\"https://github.com/DaftMonk/generator-angular-fullstack/issues?state=open\">Issues</a></p></div>");
 $templateCache.put("components/navbar/navbar.html","<md-toolbar><div layout=\"column\" layout-align=\"center center\" ng-show=\"nav.isLoggedIn()\" class=\"inset\"> <a ng-href=\" {{nav.UserProfileLink}}\"><img src=\"{{ nav.currentUser.picture }}\" alt=\"{{nav.currentUser.picture}}\" class=\"avatar-picture\"/></a><a ng-href=\"{{nav.UserProfileLink}}\"><div id=\"user-name-on-navbar\">{{ nav.currentUser.name | uppercase}}</div></a></div><div layout=\"column\" layout-align=\"center center\" ng-hide=\"nav.isLoggedIn()\" class=\"inset unsigned-user-toolbar\"> <i class=\"material-icons\">account_circle</i><oauth-buttons></oauth-buttons></div></md-toolbar><md-divider>  </md-divider><md-content flex=\"flex\"><md-list class=\"md-dense\"><md-list-item class=\"md-2-line active-link\"><md-button id=\"sup-j-navbar-superstars\" ui-sref=\"{{nav.SuperstarsLink}}\" ng-click=\"nav.SuperstarsLink\"><i class=\"material-icons\">star</i><span class=\"text-icon\">SUPERSTARS</span></md-button></md-list-item><md-list-item class=\"md-2-line\"><a id=\"sup-j-navbar-acdc\" href=\"{{nav.ACDCLink}}\" target=\"_blank\"><i class=\"material-icons\">date_range</i>ACDC</a></md-list-item><md-list-item class=\"md-2-line\"><a id=\"sup-j-navbar-academy\" href=\"{{nav.AcademyLink}}\" target=\"_blank\"><i class=\"material-icons\">school</i>ACADEMY</a></md-list-item><md-list-item class=\"md-2-line\"><a id=\"sup-j-navbar-miles\" href=\"{{nav.MilesLink}}\" target=\"_blank\"><i class=\"material-icons\">account_balance_wallet</i>MILES</a></md-list-item><md-list-item class=\"md-2-line\"><a id=\"sup-j-navbar-acpm\" href=\"{{nav.ACPMLink}}\" target=\"_blank\"><i class=\"material-icons\">assessment</i>ACPM</a></md-list-item></md-list></md-content><div ng-show=\"nav.isLoggedIn()\"> <md-divider class=\"bottom-divider\"></md-divider><md-content class=\"bottom-content\"><div class=\"logout-container\"><md-button id=\"navbar-logout-button\" ng-href=\"/logout\" class=\"md-raised\">Logout</md-button></div></md-content></div>");
@@ -3030,8 +3298,8 @@ $templateCache.put("components/oauth-buttons/oauth-buttons.html","<md-button id=
 $templateCache.put("components/scrollTopButton/scrollTopButton.html","<md-button ng-click=\"$ctrl.goTop()\" class=\"md-fab md-primary\"><i id=\"arrow-up\" class=\"material-icons\">arrow_upward</i></md-button>");
 $templateCache.put("components/toolbar/listBottomMenu.html","<md-bottom-sheet id=\"bottom-menu\" ng-cloak=\"ng-cloak\" class=\"md-list md-has-header\"><md-list><div ng-repeat=\"item in ListBottomCtrl.items\" ng-show=\"ListBottomCtrl.showMenuItem(item)\"><md-list-item><md-button ng-if=\"!item.hasOptions\" ng-click=\"ListBottomCtrl.listItemClick($index)\" class=\"md-list-item-content\"><a ui-sref=\"{{item.sref}}\" ng-click=\"item.sref\" ui-sref-active=\"active\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"md-inline-list-icon-label\">{{ item.name | translate }}</span></a></md-button><md-button ng-if=\"item.hasOptions\" ng-click=\"ListBottomCtrl.openSubMenu($index)\" class=\"md-list-item-content\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"md-inline-list-icon-label\">{{ item.name | translate }}</span></md-button></md-list-item><md-list-item ng-if=\"item.hasOptions &amp;&amp; item.openMenu\" ng-repeat=\"menu in item.menuOptions\" class=\"sub-menu-bottom\"><md-button class=\"md-list-item-content\"><a href=\"{{menu.link}}\" target=\"_blank\"><div layout=\"row\"><div ng-bind-html=\"menu.icon\"></div><span class=\"md-inline-list-icon-label\">{{menu.label}}</span></div></a></md-button></md-list-item></div></md-list></md-bottom-sheet>");
 $templateCache.put("components/toolbar/toolbar.html","<md-toolbar ng-show=\"!toolbarCtrl.isLoggedIn()\" class=\"animate-show\"><div class=\"md-toolbar-tools\"><md-button ng-click=\"toolbarCtrl.toggleSidenav(\'left\')\" aria-label=\"Menu\" class=\"md-icon-button\"><i class=\"material-icons\">menu</i></md-button></div></md-toolbar><md-toolbar ng-show=\"toolbarCtrl.isLoggedIn()\" class=\"animate-show md-whiteframe-z1\"><div data-ng-show=\"toolbarCtrl.showMobileMainHeader\" class=\"md-toolbar-tools\"><md-button ng-click=\"toolbarCtrl.toggleSidenav(\'left\')\" aria-label=\"Menu\" class=\"md-icon-button\"><i class=\"material-icons\">menu</i></md-button><i hide-xs=\"hide-xs\" class=\"material-icons\">search</i><span flex=\"flex\" hide-xs=\"hide-xs\"><md-input-container md-no-float=\"\"><input id=\"sup-j-toolBar-searchField\" placeholder=\"Search for people\" ng-model=\"toolbarCtrl.searchText\" ng-model-options=\"{debounce:180}\" ng-change=\"toolbarCtrl.checkLenghtAndUpdate()\" type=\"text\"/></md-input-container></span><div hide-xs=\"hide-xs\" hide-sm=\"hide-sm\" ng-repeat=\"item in toolbarCtrl.items\" ng-show=\"toolbarCtrl.showMenuItem(item)\" class=\"button-container\"><md-button ng-if=\"!item.hasOptions\" aria-label=\"{{ buttom.name | translate }}\" target=\"{{item.target}}\" ui-sref=\"{{item.sref}}\" ng-click=\"item.sref\" id=\"sup-profile-{{ item.name.split(\' \').join(\'\') }}\" ui-sref-active=\"active\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"text-icon\">{{ item.name | translate }}</span></md-button><md-button ng-if=\"item.hasOptions\" aria-label=\"{{ buttom.name | translate }}\" ng-click=\"toolbarCtrl.openButtonMenu($index)\" id=\"sup-profile-{{ item.name.split(\' \').join(\'\') }}\"><i class=\"material-icons\">{{item.icon}}</i><span class=\"text-icon\">{{ item.name | translate }}</span></md-button><div hide-on-click-window=\"hide-on-click-window\" rule=\"{{toolbarCtrl.items[$index].openMenu}}\" ng-if=\"item.hasOptions\" class=\"menu-content md-whiteframe-4dp\"><div ng-repeat=\"menu in toolbarCtrl.items[$index].menuOptions\" class=\"menu-itens\"><a href=\"#\" ui-sref=\"{{menu.link}}\" target=\"_blank\"><div layout=\"row\"><div ng-bind-html=\"menu.icon\"></div><div class=\"menu-label\">{{menu.label}}</div></div></a></div></div></div><span flex=\"\" hide-gt-xs=\"\">      </span><md-button aria-label=\"Search\" hide-gt-xs=\"\" data-ng-click=\"toolbarCtrl.setMobileMainHeader(false)\" class=\"md-icon-button\"><i class=\"material-icons\">search</i></md-button><md-button aria-label=\"More\" hide-gt-sm=\"hide-gt-sm\" ng-click=\"toolbarCtrl.showListBottomSheet()\" class=\"md-icon-button\"><i class=\"material-icons\">more_vert</i></md-button></div><div hide-gt-xs=\"hide-gt-xs\" data-ng-hide=\"toolbarCtrl.showMobileMainHeader\" class=\"md-toolbar-tools\"><md-button aria-label=\"Back\" data-ng-click=\"toolbarCtrl.setMobileMainHeader(true)\" class=\"md-icon-button\"><i class=\"material-icons\">arrow_back</i></md-button><div md-no-float=\"md-no-float\" style=\"padding-bottom:0px;\" class=\"custom-input-container md-accent\"><span flex=\"flex\"><md-input-container md-no-float=\"\"><input id=\"sup-j-toolBar-searchField\" placeholder=\"Search\" ng-model=\"toolbarCtrl.searchText\" ng-model-options=\"{debounce:180}\" ng-change=\"toolbarCtrl.checkLenghtAndUpdate()\" type=\"text\"/></md-input-container></span></div></div></md-toolbar>");
-$templateCache.put("components/userCard/userCard.html","<div id=\"sup-j-userCard\" ng-click=\"$ctrl.click()\" layout=\"column\" layout-align=\"none center\" class=\"container\"><img ng-src=\"{{$ctrl.user.picture}}\" alt=\"\" class=\"user-avatar\"/><div class=\"user-name\">{{$ctrl.user.name}}</div><div class=\"user-position\"><md-tooltip md-direction=\"bottom\">{{ $ctrl.positionsTooltip }}</md-tooltip><p ng-show=\"$ctrl.user.positions.length === 0\" class=\"position\">{{ $ctrl.positionsTooltip }}</p><p ng-show=\"$ctrl.user.positions.length === 1\" class=\"position\">{{ $ctrl.user.positions[0].name }}</p><p ng-show=\"$ctrl.user.positions.length &gt; 1\" class=\"position\">{{ $ctrl.user.positions[0].name }} and others</p></div><div class=\"user-email\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.email}}</md-tooltip><div class=\"user-email-text\">{{$ctrl.user.email}}</div></div><div layout=\"row\" layout-align=\"center center\" class=\"actions\"><div ng-show=\"$ctrl.user.social.facebook\" class=\"action facebook\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.facebook}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.facebook}}\" target=\"_blank\"><i class=\"fa fa-facebook-square\"></i></a></div><div ng-show=\"$ctrl.user.social.twitter\" class=\"action twitter\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.twitter}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.twitter}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-twitter\"></i></a></div><div ng-show=\"$ctrl.user.social.skype\" class=\"action skype\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.skype}}</md-tooltip><i aria-hidden=\"true\" class=\"fa fa-skype\"></i></div><div ng-show=\"$ctrl.user.social.linkedIn\" class=\"action linkedIn\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.linkedIn}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.linkedIn}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-linkedin\"></i></a></div></div></div>");
-$templateCache.put("components/userList/userList.html","<md-content layout=\"column\" flex=\"flex\" layout-align=\"center center\" ng-hide=\"!$ctrl.loaded || $ctrl.usersShown.length\" class=\"no-results ng-hide\"><div class=\"icon-sad\">:(</div><div class=\"message\">Sorry! No results for: \"{{$ctrl.query}}\"</div></md-content><md-content md-scroll-y=\"md-scroll-y\" layout=\"row\" layout-wrap=\"layout-wrap\" flex=\"flex\" z-infinite-scroll=\"$ctrl.eventHandler\" scroll-threshold=\"300\" time-threshold=\"0\" ng-show=\"$ctrl.usersShown.length\" id=\"user-cards-content\"><user-card ng-repeat=\"user in $ctrl.usersShown\" flex-xs=\"100\" flex-sm=\"50\" flex=\"25\" user=\"user\" on-click=\"$ctrl.click(user)\"></user-card><scroll-top-button parent-id=\"user-cards-content\" min-height=\"304\" miliseconds=\"1000\"></scroll-top-button></md-content>");
+$templateCache.put("components/userCard/userCard.html","<div id=\"sup-j-userCard\" ng-click=\"$ctrl.click()\" layout=\"column\" layout-align=\"none center\" class=\"container\"> <img ng-src=\"{{$ctrl.user.picture}}\" alt=\"\" class=\"user-avatar\"/><div class=\"user-name\">{{$ctrl.user.name}}</div><div class=\"user-position\"><md-tooltip md-direction=\"bottom\">{{ $ctrl.positionsTooltip }}</md-tooltip><p ng-show=\"$ctrl.user.positions.length === 0\" class=\"position\">{{ $ctrl.positionsTooltip }}</p><p ng-show=\"$ctrl.user.positions.length === 1\" class=\"position\">{{ $ctrl.user.positions[0].name }}</p><p ng-show=\"$ctrl.user.positions.length &gt; 1\" class=\"position\">{{ $ctrl.user.positions[0].name }} and others</p></div><div class=\"user-email\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.email}}</md-tooltip><div class=\"user-email-text\">{{$ctrl.user.email}}</div></div><div layout=\"row\" layout-align=\"center center\" class=\"actions\"><div ng-show=\"$ctrl.user.social.facebook\" class=\"action facebook\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.facebook}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.facebook}}\" target=\"_blank\"><i class=\"fa fa-facebook-square\"></i></a></div><div ng-show=\"$ctrl.user.social.twitter\" class=\"action twitter\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.twitter}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.twitter}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-twitter\"></i></a></div><div ng-show=\"$ctrl.user.social.skype\" class=\"action skype\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.skype}}</md-tooltip><i aria-hidden=\"true\" class=\"fa fa-skype\"></i></div><div ng-show=\"$ctrl.user.social.linkedIn\" class=\"action linkedIn\"><md-tooltip md-direction=\"bottom\">{{$ctrl.user.social.linkedIn}}</md-tooltip><a ng-href=\"{{$ctrl.socialUrls.linkedIn}}\" target=\"_blank\"><i aria-hidden=\"true\" class=\"fa fa-linkedin\"></i></a></div></div></div>");
+$templateCache.put("components/userList/userList.html","<md-content layout=\"column\" flex=\"flex\" layout-align=\"center center\" ng-hide=\"!$ctrl.loaded || $ctrl.usersShown.length\" class=\"no-results ng-hide\"><div class=\"icon-sad\">:(</div><div class=\"message\">Sorry! No results for: \"{{$ctrl.query}}\"</div></md-content><md-content md-scroll-y=\"md-scroll-y\" layout=\"row\" layout-wrap=\"layout-wrap\" flex=\"flex\" z-infinite-scroll=\"$ctrl.eventHandler\" scroll-threshold=\"300\" time-threshold=\"0\" ng-show=\"$ctrl.usersShown.length\" id=\"user-cards-content\"><user-card ng-repeat=\"user in $ctrl.usersShown\" flex-xs=\"100\" flex-sm=\"50\" flex=\"25\" user=\"user\"></user-card><scroll-top-button parent-id=\"user-cards-content\" min-height=\"304\" miliseconds=\"1000\"></scroll-top-button></md-content>");
 $templateCache.put("app/account/login/login.html","<div layout=\"column\" layout-align=\"center center\" flex=\"flex\" class=\"oauth-button-container\"><div layout=\"column\" layout-align=\"center center\" layout-wrap=\"layout-wrap\" flex=\"flex\"><img alt=\"Avenue Code Superstars\" src=\"assets/images/main_logo-c45f76e722.png\" class=\"img-responsive text-center\"/><p id=\"non-ac-account-login-msg\">You need to have an Avenue Code account to access this application.</p><p class=\"error\">{{ serverMessage }}</p><oauth-buttons classes=\"btn-block\"></oauth-buttons></div></div>");
 $templateCache.put("components/profile/aboutMe/aboutMe.html","<profile-tile title=\"About me\" icon=\"person_outline\" on-help=\"$ctrl.help($event)\" profile-tile-locker-id=\"$ctrl.profileTileLockerId\" locked=\"$ctrl.locked\" read-only=\"$ctrl.readOnly\"><md-input-container class=\"md-block\"><textarea id=\"sup-j-profile-aboutMe\" ng-model=\"$ctrl.user.aboutMe\" ng-if=\"$ctrl.readOnly\" readonly=\"$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"About me\" class=\"about-me\"></textarea><textarea id=\"sup-j-profile-aboutMe\" ng-model=\"$ctrl.user.aboutMe\" ng-if=\"!$ctrl.readOnly\" ng-change=\"$ctrl.update()\" ng-model-options=\"{updateOn: \'default blur\', debounce:{ \'default\': 1500, \'blur\': 0}}\" aria-label=\"About me\" class=\"about-me\"></textarea></md-input-container></profile-tile>");
 $templateCache.put("components/profile/adminBar/adminBar.html","<div layout=\"row\" layout-align=\"space-between center\" layout-wrap=\"layout-wrap\" flex=\"flex\" class=\"admin-bar\"><div class=\"bench\"><md-switch md-no-ink=\"md-no-ink\" aria-label=\"Switch No Ink\" ng-model=\"$ctrl.user.onBench\" ng-change=\"$ctrl.update()\" class=\"md-primary\">User on bench</md-switch></div><div class=\"timestamp\">Last time edited: {{ $ctrl.user.updatedAt | date: \'MM/dd/yyyy - HH:mm\'}}</div><div class=\"delete\"><md-button ng-click=\"$ctrl.delete()\" class=\"md-raised\">Delete Profile</md-button></div></div>");

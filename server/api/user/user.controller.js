@@ -9,6 +9,7 @@ var _keys = require('babel-runtime/core-js/object/keys');
 var _keys2 = _interopRequireDefault(_keys);
 
 exports.index = index;
+exports.getUsersByUsername = getUsersByUsername;
 exports.show = show;
 exports.update = update;
 exports.erase = erase;
@@ -279,6 +280,14 @@ function index(req, res) {
   var query = getQuerySearchByName(req.query);
 
   return _user2.default.find(query).sort({ name: 1 }).exec().then(respondWithBasicProfileResultList(res)).catch(handleError(res));
+}
+
+function getUsersByUsername(req, res) {
+  if (!req.query || !req.query.q || req.query.q.length === 0) {
+    return res.status(200).json([]);
+  }
+
+  return _user2.default.find({ username: { $in: req.query.q } }).sort({ name: 1 }).exec().then(respondWithBasicProfileResultList(res)).catch(handleError(res));
 }
 
 /**

@@ -13,6 +13,7 @@ exports.default = function (app, config) {
   app.use('/api/positions', require('./api/position'));
   app.use('/api/skills', require('./api/skill'));
   app.use('/api/users', require('./api/user'));
+  app.use('/api/charts', require('./api/chart/'));
   app.use('/api/public/users', require('./api/public'));
 
   app.use('/auth', require('./auth').default);

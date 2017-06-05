@@ -217,7 +217,8 @@ UserSchema.virtual('profile').get(function () {
     'social': this.social,
     'picture': this.getProfilePicture(),
     'username': this.username,
-    'isProfileComplete': this.profileComplete
+    'isProfileComplete': this.profileComplete,
+    'onBench': this.onBench
   };
 });
 
